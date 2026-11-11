@@ -269,14 +269,22 @@
     .btn-back {
       background: none;
       border: none;
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       border-radius: 50%;
       color: var(--text-main);
+      transition: background 0.15s ease, transform 0.15s ease;
+      flex-shrink: 0;
+    }
+    .btn-back:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .btn-back:active {
+      transform: scale(0.92);
     }
     .header-title {
       font-size: 16px;
@@ -632,13 +640,76 @@
     }
 
     /* =========================================================
-       [Step 3] AI 사진 촬영 / 첨부 (첨부 3 좌측)
+       [Step 3] AI 3방향 사진 촬영 (전신 정면, 좌측면, 우측면)
        ========================================================= */
     #screen-capture {
-      background: #1b2422;
+      background: #0f1715;
       color: var(--white);
       padding: 0;
+      position: relative;
     }
+
+    /* 3방향 전환 탭 */
+    .capture-angle-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 10px 14px;
+      background: #141f1c;
+      border-bottom: 1px solid rgba(56, 201, 178, 0.18);
+      z-index: 30;
+      flex-shrink: 0;
+    }
+    .angle-tab-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: #9cb3ad;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .angle-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.09);
+    }
+    .angle-tab-btn.active {
+      background: rgba(56, 201, 178, 0.18);
+      border-color: var(--primary-mint);
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(56, 201, 178, 0.3);
+    }
+    .angle-tab-btn .tab-step-badge {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      font-size: 10.5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .angle-tab-btn.active .tab-step-badge {
+      background: var(--primary-mint);
+      color: #0d1a17;
+    }
+    .angle-tab-btn.completed {
+      border-color: rgba(56, 201, 178, 0.5);
+      color: #ffffff;
+    }
+    .angle-tab-btn.completed .tab-step-badge {
+      background: #38c9b2;
+      color: #0c1815;
+    }
+
     .camera-container {
       flex: 1;
       position: relative;
@@ -646,8 +717,8 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background: #151d1b;
-      min-height: 420px;
+      background: #0d1412;
+      min-height: 380px;
     }
     .camera-preview-img {
       width: 100%;
@@ -662,70 +733,174 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 250px;
-      height: 250px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      width: 270px;
+      height: 270px;
+      border: 1px dashed rgba(56, 201, 178, 0.24);
       border-radius: 50%;
       pointer-events: none;
+      animation: pulseCrosshair 4s infinite ease-in-out;
     }
-    .body-guide-svg {
+    @keyframes pulseCrosshair {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.45; }
+      50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.85; }
+    }
+
+    /* 3방향 신체 가이드라인 SVG */
+    .body-guide-wrap {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 170px;
+      width: 200px;
       height: 360px;
       pointer-events: none;
-      filter: drop-shadow(0 0 8px rgba(56, 201, 178, 0.8));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
     }
-    /* 4대 말풍선 핀 (첨부 3) */
+    .body-guide-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 10px rgba(56, 201, 178, 0.7));
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    /* 4대 말풍선 핀 (각도별 유동 안내) */
     .pin-bubble {
       position: absolute;
-      background: var(--white);
+      background: rgba(255, 255, 255, 0.95);
       color: #111a18;
-      padding: 7px 13px;
-      border-radius: 20px;
-      font-size: 12.5px;
+      padding: 6px 12px;
+      border-radius: 18px;
+      font-size: 11.5px;
       font-weight: 800;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-      border: 2px solid var(--primary-mint);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      border: 1.5px solid var(--primary-mint);
       pointer-events: none;
       white-space: nowrap;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .pin-neck { top: 16%; right: 14px; }
-    .pin-shoulder { top: 23%; left: 14px; }
-    .pin-waist { top: 52%; left: 16px; }
-    .pin-arm { top: 54%; right: 16px; }
+    .pin-neck { top: 15%; right: 14px; }
+    .pin-shoulder { top: 24%; left: 14px; }
+    .pin-waist { top: 51%; left: 16px; }
+    .pin-arm { top: 55%; right: 16px; }
+
+    /* 3방향 썸네일 스트립 */
+    .capture-thumb-strip {
+      width: 100%;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+    .thumb-slot {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 7px 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1.5px dashed rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .thumb-slot:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .thumb-slot.active {
+      border-color: var(--primary-mint);
+      border-style: solid;
+      background: rgba(56, 201, 178, 0.12);
+      box-shadow: 0 0 10px rgba(56, 201, 178, 0.25);
+    }
+    .thumb-slot.completed {
+      border-style: solid;
+      border-color: rgba(56, 201, 178, 0.6);
+      background: rgba(56, 201, 178, 0.15);
+    }
+    .thumb-preview-box {
+      width: 44px;
+      height: 52px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .thumb-preview-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .thumb-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #9cb3ad;
+      letter-spacing: -0.2px;
+    }
+    .thumb-slot.active .thumb-label {
+      color: #ffffff;
+    }
+    .thumb-slot.completed .thumb-label {
+      color: #38c9b2;
+    }
+    .thumb-check-icon {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 18px;
+      height: 18px;
+      background: #38c9b2;
+      color: #0c1815;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 900;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
 
     .capture-bottom-bar {
-      background: #182220;
-      padding: 16px 20px 24px 20px;
+      background: #141f1c;
+      padding: 12px 18px 22px 18px;
       border-top-left-radius: 24px;
       border-top-right-radius: 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-shrink: 0;
+      border-top: 1px solid rgba(56, 201, 178, 0.16);
     }
     .capture-controls {
       width: 100%;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
     .btn-icon-sq {
       width: 48px;
       height: 48px;
-      border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       color: var(--white);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .btn-icon-sq:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.14);
     }
 
     /* =========================================================
@@ -2089,10 +2264,12 @@
           <rect x="9.5" y="3" width="2.5" height="9" rx="0.6"/>
           <rect x="14" y="0" width="2.5" height="12" rx="0.6"/>
         </svg>
-        <svg width="16" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
-          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
-          <line x1="12" y1="20" x2="12.01" y2="20" stroke-width="3"/>
+        <!-- 와이파이 아이콘 (확대 및 시인성 개선) -->
+        <svg width="19" height="14" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 1px;">
+          <path d="M1.5 4.5a15.5 15.5 0 0 1 21 0"/>
+          <path d="M5 8.5a10.5 10.5 0 0 1 14 0"/>
+          <path d="M8.5 12.5a5.5 5.5 0 0 1 7 0"/>
+          <circle cx="12" cy="16.5" r="1.3" fill="currentColor"/>
         </svg>
         <svg width="22" height="12" viewBox="0 0 24 12" fill="none">
           <rect x="1" y="1" width="19" height="10" rx="3" stroke="currentColor" stroke-width="1.8"/>
@@ -2117,7 +2294,7 @@
         <!-- 미러핏 공식 심볼 & 로고 비주얼 카드 -->
         <div class="splash-logo-wrap">
           <div class="splash-logo-card">
-            <img src="./mirrorfit-logo.png" onerror="this.onerror=null; this.src='file:///C:/Users/shin1/.gemini/antigravity/brain/a8c8f222-7ba2-43b1-a257-e990c9c0963d/.user_uploaded/media_1794149729839_de04c2c3.png';" alt="MirrorFit Official Logo" class="splash-logo-img">
+            <img src="./mirrorfit-logo.png" onerror="this.onerror=null; this.src='mirrorfit-logo.png';" alt="MirrorFit Official Logo" class="splash-logo-img">
           </div>
         </div>
 
@@ -2144,7 +2321,7 @@
       <section class="screen" id="screen-login">
         <div class="login-header">
           <div style="display:flex; justify-content:center; margin-bottom:10px;">
-            <img src="./mirrorfit-logo.png" onerror="this.onerror=null; this.src='file:///C:/Users/shin1/.gemini/antigravity/brain/a8c8f222-7ba2-43b1-a257-e990c9c0963d/.user_uploaded/media_1794149729839_de04c2c3.png';" style="width:52px; height:52px; border-radius:14px; box-shadow:0 6px 16px rgba(32,181,159,0.18); border:1px solid rgba(220,238,234,0.8);" alt="MirrorFit">
+            <img src="./mirrorfit-logo.png" onerror="this.onerror=null; this.src='mirrorfit-logo.png';" style="width:52px; height:52px; border-radius:14px; box-shadow:0 6px 16px rgba(32,181,159,0.18); border:1px solid rgba(220,238,234,0.8);" alt="MirrorFit">
           </div>
           <h2>간편하게 시작하기</h2>
           <p>내 체형 분석 데이터를 안전하게 보관합니다</p>
@@ -2172,7 +2349,9 @@
            ======================================================== -->
       <section class="screen" id="screen-guide">
         <header class="nav-header">
-          <button class="btn-back" id="btnBackToLogin">&lt;</button>
+          <button class="btn-back" id="btnBackToLogin" aria-label="뒤로가기">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
           <span class="header-title">골격 체형 가이드</span>
           <div style="width:36px;"></div>
         </header>
@@ -2197,20 +2376,54 @@
               <span class="brand-logo-badge" style="margin:0;">입체감 &amp; 탄력</span>
             </div>
             <div class="card-visual-box">
-              <!-- 스트레이트: 균형 잡힌 체형 (어깨≈엉덩이, 완만한 허리) -->
-              <svg width="90" height="120" viewBox="0 0 100 130" fill="none">
-                <!-- 머리 -->
-                <circle cx="50" cy="11" r="10" fill="#38c9b2"/>
-                <!-- 왼팔 (타원형, 자연스럽게 늘어뜨림) -->
-                <ellipse cx="21" cy="57" rx="7" ry="24" fill="#38c9b2"/>
-                <!-- 오른팔 -->
-                <ellipse cx="79" cy="57" rx="7" ry="24" fill="#38c9b2"/>
-                <!-- 몸통 (어깨폭=엉덩이폭, 약간의 허리 곡선) -->
-                <path d="M33 21 L67 21 C74 25 76 36 76 50 C76 62 72 70 66 74 L64 94 L36 94 L34 74 C28 70 24 62 24 50 C24 36 26 25 33 21Z" fill="#38c9b2"/>
-                <!-- 왼쪽 다리 -->
-                <path d="M36 94 C34 106 32 118 32 128 L44 128 L46 94Z" fill="#2ca894"/>
-                <!-- 오른쪽 다리 -->
-                <path d="M64 94 C66 106 68 118 68 128 L56 128 L54 94Z" fill="#2ca894"/>
+              <!-- 스트레이트: 균형 잡힌 상체 볼륨 & 높은 중심축 (정밀 인체 벡터) -->
+              <svg width="110" height="150" viewBox="0 0 120 160" fill="none">
+                <defs>
+                  <linearGradient id="gradStraightBody" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#4ae3cc"/>
+                    <stop offset="50%" stop-color="#28bda6"/>
+                    <stop offset="100%" stop-color="#199984"/>
+                  </linearGradient>
+                  <linearGradient id="gradStraightGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#38c9b2" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="#38c9b2" stop-opacity="0.0"/>
+                  </linearGradient>
+                  <filter id="straightGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur"/>
+                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                  </filter>
+                </defs>
+                <!-- 배경 바디 아우라 -->
+                <ellipse cx="60" cy="80" rx="38" ry="65" fill="url(#gradStraightGlow)"/>
+                
+                <!-- 인체 실루엣 (스트레이트: 어깨≈골반 균형, 높은 바스트, 탄력 라인) -->
+                <!-- 머리 & 목 -->
+                <ellipse cx="60" cy="18" rx="10" ry="12" fill="url(#gradStraightBody)"/>
+                <path d="M56 29 L56 37 L64 37 L64 29 Z" fill="url(#gradStraightBody)"/>
+
+                <!-- 상체 및 몸통 -->
+                <path d="M42 38 C47 36 53 36 60 36 C67 36 73 36 78 38 C83 40 85 45 84 52 C83 60 79 66 75 72 C73 75 71 82 72 90 C73 97 76 102 78 106 L42 106 C44 102 47 97 48 90 C49 82 47 75 45 72 C41 66 37 60 36 52 C35 45 37 40 42 38 Z" fill="url(#gradStraightBody)"/>
+
+                <!-- 양팔 (자연스럽게 늘어뜨린 탄력 있는 팔) -->
+                <path d="M35 44 C33 52 30 65 30 78 C30 88 32 98 33 105 C35 105 37 104 38 101 C36 94 35 84 36 76 C37 68 39 56 41 46 Z" fill="#22aa94"/>
+                <path d="M85 44 C87 52 90 65 90 78 C90 88 88 98 87 105 C85 105 83 104 82 101 C84 94 85 84 84 76 C83 68 81 56 79 46 Z" fill="#22aa94"/>
+
+                <!-- 하체 (허벅지 탄력, 곧게 뻗은 다리) -->
+                <!-- 왼다리 -->
+                <path d="M44 106 C45 116 47 128 47 138 C47 146 45 152 44 156 L55 156 C57 151 57 144 57 136 C57 126 56 116 57 106 Z" fill="#1b8e7c"/>
+                <!-- 오른다리 -->
+                <path d="M76 106 C75 116 73 128 73 138 C73 146 75 152 76 156 L65 156 C63 151 63 144 63 136 C63 126 64 116 63 106 Z" fill="#1b8e7c"/>
+
+                <!-- 골격 랜드마크 분석 오버레이선 -->
+                <!-- 어깨 밸런스 수평선 -->
+                <line x1="36" y1="41" x2="84" y2="41" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.85"/>
+                <!-- 바스트 포인트 중심축 -->
+                <circle cx="51" cy="54" r="2.5" fill="#ffffff" filter="url(#straightGlow)"/>
+                <circle cx="69" cy="54" r="2.5" fill="#ffffff" filter="url(#straightGlow)"/>
+                <!-- 골반 수평선 -->
+                <line x1="40" y1="104" x2="80" y2="104" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.85"/>
+                <!-- 척추 중심선 -->
+                <line x1="60" y1="36" x2="60" y2="106" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.6"/>
               </svg>
             </div>
             <div class="type-desc-list">
@@ -2236,20 +2449,53 @@
               <span class="brand-logo-badge" style="margin:0;">우아한 곡선미</span>
             </div>
             <div class="card-visual-box">
-              <!-- 웨이브: 좁은 어깨, 넓은 엉덩이 (서양배형/모래시계형) -->
-              <svg width="90" height="120" viewBox="0 0 100 130" fill="none">
-                <!-- 머리 (약간 작게) -->
-                <circle cx="50" cy="11" r="9" fill="#38c9b2"/>
-                <!-- 왼팔 (어깨 좁아 더 안쪽에 위치) -->
-                <ellipse cx="23" cy="54" rx="6" ry="21" fill="#38c9b2"/>
-                <!-- 오른팔 -->
-                <ellipse cx="77" cy="54" rx="6" ry="21" fill="#38c9b2"/>
-                <!-- 몸통 (좁은 어깨→잘록한 허리→넓은 엉덩이) -->
-                <path d="M37 20 L63 20 C70 24 72 34 72 46 C74 58 78 68 76 76 L72 94 L28 94 L24 76 C22 68 26 58 28 46 C28 34 30 24 37 20Z" fill="#38c9b2"/>
-                <!-- 왼쪽 다리 (엉덩이가 넓으므로 다리 간격 넓게) -->
-                <path d="M30 94 C28 106 26 118 26 128 L40 128 L44 94Z" fill="#2ca894"/>
-                <!-- 오른쪽 다리 -->
-                <path d="M70 94 C72 106 74 118 74 128 L60 128 L56 94Z" fill="#2ca894"/>
+              <!-- 웨이브: 좁은 어깨, 긴 허리, 유려한 골반/하체 곡선 (정밀 인체 벡터) -->
+              <svg width="110" height="150" viewBox="0 0 120 160" fill="none">
+                <defs>
+                  <linearGradient id="gradWaveBody" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#55e8d2"/>
+                    <stop offset="50%" stop-color="#22baa2"/>
+                    <stop offset="100%" stop-color="#148d79"/>
+                  </linearGradient>
+                  <linearGradient id="gradWaveGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#20b59f" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="#20b59f" stop-opacity="0.0"/>
+                  </linearGradient>
+                  <filter id="waveGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur"/>
+                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                  </filter>
+                </defs>
+                <!-- 배경 바디 아우라 -->
+                <ellipse cx="60" cy="85" rx="40" ry="65" fill="url(#gradWaveGlow)"/>
+
+                <!-- 인체 실루엣 (웨이브: 가녀린 목, 좁은 어깨, 긴 허리, 넓은 골반 곡선) -->
+                <!-- 머리 & 가녀리고 긴 목 -->
+                <ellipse cx="60" cy="16" rx="9" ry="11" fill="url(#gradWaveBody)"/>
+                <path d="M57 26 L57 37 L63 37 L63 26 Z" fill="url(#gradWaveBody)"/>
+
+                <!-- 상체 및 골반 (슬림 상체 → 잘록한 허리 → 넓어지는 힙) -->
+                <path d="M46 38 C49 37 54 37 60 37 C66 37 71 37 74 38 C79 40 80 46 78 54 C76 62 72 70 68 76 C66 80 65 85 66 90 C68 96 75 102 81 108 L39 108 C45 102 52 96 54 90 C55 85 54 80 52 76 C48 70 44 62 42 54 C40 46 41 40 46 38 Z" fill="url(#gradWaveBody)"/>
+
+                <!-- 슬림한 양팔 -->
+                <path d="M39 44 C37 52 35 65 35 78 C35 88 36 98 37 105 C38 105 40 104 41 101 C40 94 39 84 40 76 C41 68 43 56 44 46 Z" fill="#22aa94"/>
+                <path d="M81 44 C83 52 85 65 85 78 C85 88 84 98 83 105 C82 105 80 104 79 101 C80 94 81 84 80 76 C79 68 77 56 76 46 Z" fill="#22aa94"/>
+
+                <!-- 하체 (여성스러운 A라인 골반 & 부드러운 다리) -->
+                <!-- 왼다리 -->
+                <path d="M41 108 C43 118 45 130 45 140 C45 147 44 153 43 156 L54 156 C55 151 55 144 55 137 C55 127 54 117 55 108 Z" fill="#1b8e7c"/>
+                <!-- 오른다리 -->
+                <path d="M79 108 C77 118 75 130 75 140 C75 147 76 153 77 156 L66 156 C65 151 65 144 65 137 C65 127 66 117 65 108 Z" fill="#1b8e7c"/>
+
+                <!-- 골격 랜드마크 분석 오버레이선 -->
+                <!-- 쇄골 라인 뚜렷함 표시 -->
+                <path d="M49 41 Q60 44 71 41" stroke="#ffffff" stroke-width="1.3" fill="none" opacity="0.9"/>
+                <!-- 잘록한 허리 포인트 -->
+                <line x1="51" y1="78" x2="69" y2="78" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.8"/>
+                <!-- 하체 볼륨 중심축 (낮은 중심선) -->
+                <line x1="36" y1="102" x2="84" y2="102" stroke="#ffffff" stroke-width="1.4" stroke-dasharray="2 2" opacity="0.9"/>
+                <circle cx="39" cy="102" r="2.5" fill="#ffffff" filter="url(#waveGlow)"/>
+                <circle cx="81" cy="102" r="2.5" fill="#ffffff" filter="url(#waveGlow)"/>
               </svg>
             </div>
             <div class="type-desc-list">
@@ -2275,15 +2521,53 @@
               <span class="brand-logo-badge" style="margin:0;">스타일리시 골격</span>
             </div>
             <div class="card-visual-box">
-              <svg width="90" height="120" viewBox="0 0 100 130" fill="none">
-                <circle cx="50" cy="22" r="13" fill="#38c9b2"/>
-                <!-- 양팔 (왼팔, 오른팔) -->
-                <path d="M28 44 C20 53 15 68 17 90 C20 90 23 88 23 84 C22 68 26 55 30 48 Z" fill="#38c9b2" opacity="0.9"/>
-                <path d="M72 44 C80 53 85 68 83 90 C80 90 77 88 77 84 C78 68 74 55 70 48 Z" fill="#38c9b2" opacity="0.9"/>
-                <!-- 몸통 및 하체 -->
-                <path d="M31 44 L50 40 L69 44 L65 72 L35 72 Z" fill="#4fe0c8" opacity="0.95"/>
-                <path d="M36 72 L36 122 L45 122 L48 72 Z" fill="#2ca894"/>
-                <path d="M64 72 L64 122 L55 122 L52 72 Z" fill="#38c9b2"/>
+              <!-- 내추럴: 넓은 어깨 프레임, 시크한 직선 골격 (정밀 인체 벡터) -->
+              <svg width="110" height="150" viewBox="0 0 120 160" fill="none">
+                <defs>
+                  <linearGradient id="gradNaturalBody" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#5ff0d8"/>
+                    <stop offset="50%" stop-color="#2fc9b2"/>
+                    <stop offset="100%" stop-color="#189d87"/>
+                  </linearGradient>
+                  <linearGradient id="gradNaturalGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#4fe0c8" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="#4fe0c8" stop-opacity="0.0"/>
+                  </linearGradient>
+                  <filter id="naturalGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur"/>
+                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                  </filter>
+                </defs>
+                <!-- 배경 바디 아우라 -->
+                <ellipse cx="60" cy="80" rx="42" ry="65" fill="url(#gradNaturalGlow)"/>
+
+                <!-- 인체 실루엣 (내추럴: 돋보이는 어깨 프레임, 박시한 몸통, 긴 라인) -->
+                <!-- 머리 & 목 -->
+                <ellipse cx="60" cy="17" rx="10" ry="12" fill="url(#gradNaturalBody)"/>
+                <path d="M55 28 L55 36 L65 36 L65 28 Z" fill="url(#gradNaturalBody)"/>
+
+                <!-- 상체 및 몸통 (넓고 각진 어깨 → 일자로 떨어지는 프레임 실루엣) -->
+                <path d="M37 38 C44 36 52 36 60 36 C68 36 76 36 83 38 C89 40 90 46 88 54 C86 63 82 72 79 80 C77 86 76 94 77 106 L43 106 C44 94 43 86 41 80 C38 72 34 63 32 54 C30 46 31 40 37 38 Z" fill="url(#gradNaturalBody)"/>
+
+                <!-- 길고 프레임 있는 양팔 -->
+                <path d="M30 42 C27 52 26 66 26 80 C26 90 28 100 29 108 C31 108 33 107 34 104 C32 96 31 85 32 76 C33 67 36 54 38 45 Z" fill="#22aa94"/>
+                <path d="M90 42 C93 52 94 66 94 80 C94 90 92 100 91 108 C89 108 87 107 86 104 C88 96 89 85 88 76 C87 67 84 54 82 45 Z" fill="#22aa94"/>
+
+                <!-- 긴 하체 (관절 프레임 강조) -->
+                <!-- 왼다리 -->
+                <path d="M43 106 C44 117 45 129 45 139 C45 147 43 153 42 156 L54 156 C56 151 57 144 57 136 C57 126 56 116 57 106 Z" fill="#1b8e7c"/>
+                <!-- 오른다리 -->
+                <path d="M77 106 C76 117 75 129 75 139 C75 147 77 153 78 156 L66 156 C64 151 63 144 63 136 C63 126 64 116 63 106 Z" fill="#1b8e7c"/>
+
+                <!-- 골격 랜드마크 분석 오버레이선 -->
+                <!-- 넓은 어깨 프레임 수평선 -->
+                <line x1="30" y1="39" x2="90" y2="39" stroke="#ffffff" stroke-width="1.6" stroke-dasharray="2 2" opacity="0.95"/>
+                <circle cx="33" cy="39" r="3" fill="#ffffff" filter="url(#naturalGlow)"/>
+                <circle cx="87" cy="39" r="3" fill="#ffffff" filter="url(#naturalGlow)"/>
+                <!-- 쇄골 뼈대 라인 -->
+                <line x1="42" y1="42" x2="78" y2="42" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+                <!-- 박시한 흉곽 프레임 -->
+                <rect x="42" y="50" width="36" height="30" rx="3" stroke="#ffffff" stroke-width="1.1" stroke-dasharray="2 2" fill="none" opacity="0.6"/>
               </svg>
             </div>
             <div class="type-desc-list">
@@ -2307,16 +2591,34 @@
       </section>
 
       <!-- ========================================================
-           [Step 3] AI 사진 촬영 / 첨부 (HTML Media Capture API 내장)
+           [Step 3] AI 3방향 사진 촬영 / 첨부 (전신 정면, 좌측면, 우측면)
            ======================================================== -->
       <section class="screen" id="screen-capture">
-        <header class="nav-header" style="background:#1b2422; border-bottom:1px solid #2d3835;">
-          <button class="btn-back" id="btnBackToGuide" style="color:#ffffff;">&lt;</button>
-          <span class="header-title" style="color:#ffffff;">체형 분석 사진 촬영</span>
+        <header class="nav-header" style="background:#141f1c; border-bottom:1px solid rgba(56,201,178,0.2);">
+          <button class="btn-back" id="btnBackToGuide" style="color:#ffffff;" aria-label="뒤로가기">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <span class="header-title" style="color:#ffffff;">체형 분석 3방향 촬영</span>
           <div style="width:36px;"></div>
         </header>
 
-        <!-- 카메라 뷰 및 가이드라인 -->
+        <!-- 3방향 전환 탭 (전신 정면 / 좌측면 / 우측면) -->
+        <div class="capture-angle-tabs">
+          <button class="angle-tab-btn active" id="tabAngleFront" data-angle="front">
+            <span class="tab-step-badge" id="badgeStepFront">1</span>
+            <span>전신 (정면)</span>
+          </button>
+          <button class="angle-tab-btn" id="tabAngleLeft" data-angle="left">
+            <span class="tab-step-badge" id="badgeStepLeft">2</span>
+            <span>좌측면</span>
+          </button>
+          <button class="angle-tab-btn" id="tabAngleRight" data-angle="right">
+            <span class="tab-step-badge" id="badgeStepRight">3</span>
+            <span>우측면</span>
+          </button>
+        </div>
+
+        <!-- 카메라 뷰 및 각도별 가이드라인 -->
         <div class="camera-container">
           <!-- 웹캠/카메라 라이브 스트림 비디오 -->
           <video id="cameraLiveVideo" autoplay playsinline muted style="display:none; width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:1;"></video>
@@ -2327,36 +2629,119 @@
 
           <div class="camera-crosshair" style="z-index:3;"></div>
 
-          <!-- 신체 와이어프레임 가이드 (양팔 포함 정밀 가이드) -->
-          <svg class="body-guide-svg" viewBox="0 0 100 220" fill="none" style="z-index:3;">
-            <circle cx="50" cy="20" r="12" stroke="#38c9b2" stroke-width="1.8" fill="rgba(56, 201, 178, 0.15)"/>
-            <!-- 양팔 와이어 가이드 -->
-            <path d="M28 42 C18 56 14 82 17 114" stroke="#38c9b2" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="2 2"/>
-            <path d="M72 42 C82 56 86 82 83 114" stroke="#38c9b2" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="2 2"/>
-            <!-- 몸통 가이드 -->
-            <path d="M30 40 L50 34 L70 40 L76 75 L66 110 L50 120 L34 110 L24 75 Z" stroke="#38c9b2" stroke-width="1.8" stroke-dasharray="2 2" fill="rgba(56, 201, 178, 0.1)"/>
-            <!-- 하체 가이드 -->
-            <path d="M34 110 L28 175 L38 210 L48 210 L48 120" stroke="#38c9b2" stroke-width="1.8"/>
-            <path d="M66 110 L72 175 L62 210 L52 210 L52 120" stroke="#38c9b2" stroke-width="1.8"/>
-          </svg>
+          <!-- 3방향 전용 신체 와이어프레임 가이드 래퍼 -->
+          <div class="body-guide-wrap" id="bodyGuideWrap">
+            <!-- 1. 전신 (정면) 가이드 SVG -->
+            <svg class="body-guide-svg" id="guideSvgFront" viewBox="0 0 100 220" fill="none">
+              <!-- 머리 & 목 -->
+              <ellipse cx="50" cy="22" rx="12" ry="14" stroke="#38c9b2" stroke-width="1.8" fill="rgba(56,201,178,0.08)" stroke-dasharray="3 2"/>
+              <!-- 어깨 수평선 -->
+              <line x1="18" y1="46" x2="82" y2="46" stroke="#38c9b2" stroke-width="1.6" stroke-dasharray="2 2" opacity="0.9"/>
+              <circle cx="24" cy="46" r="2.5" fill="#38c9b2"/>
+              <circle cx="76" cy="46" r="2.5" fill="#38c9b2"/>
+              <!-- 양팔 가이드 -->
+              <path d="M22 48 C16 70 14 95 16 115 C18 115 20 114 21 110 C21 95 24 72 28 52 Z" stroke="#38c9b2" stroke-width="1.6" fill="rgba(56,201,178,0.06)" stroke-dasharray="3 2"/>
+              <path d="M78 48 C84 70 86 95 84 115 C82 115 80 114 79 110 C79 95 76 72 72 52 Z" stroke="#38c9b2" stroke-width="1.6" fill="rgba(56,201,178,0.06)" stroke-dasharray="3 2"/>
+              <!-- 몸통 윤곽선 -->
+              <path d="M30 46 C38 43 45 43 50 43 C55 43 62 43 70 46 C75 52 76 66 73 78 C71 86 73 96 74 108 L26 108 C27 96 29 86 27 78 C24 66 25 52 30 46 Z" stroke="#38c9b2" stroke-width="1.8" fill="rgba(56,201,178,0.08)" stroke-dasharray="3 2"/>
+              <!-- 허리 & 골반 수평선 -->
+              <line x1="28" y1="76" x2="72" y2="76" stroke="#38c9b2" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.75"/>
+              <line x1="24" y1="106" x2="76" y2="106" stroke="#38c9b2" stroke-width="1.6" stroke-dasharray="2 2" opacity="0.9"/>
+              <circle cx="28" cy="106" r="2.5" fill="#38c9b2"/>
+              <circle cx="72" cy="106" r="2.5" fill="#38c9b2"/>
+              <!-- 중앙 수직 정렬선 (Plumb line) -->
+              <line x1="50" y1="8" x2="50" y2="210" stroke="#38c9b2" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.6"/>
+              <!-- 양 다리 -->
+              <path d="M30 108 C32 135 33 165 33 205 L44 205 C46 165 47 135 48 108 Z" stroke="#38c9b2" stroke-width="1.8" fill="rgba(56,201,178,0.06)"/>
+              <path d="M70 108 C68 135 67 165 67 205 L56 205 C54 165 53 135 52 108 Z" stroke="#38c9b2" stroke-width="1.8" fill="rgba(56,201,178,0.06)"/>
+            </svg>
 
-          <!-- 첨부 3 말풍선 4종 -->
-          <div class="pin-bubble pin-neck" style="z-index:4;">목 둘레, 목 길이</div>
-          <div class="pin-bubble pin-shoulder" style="z-index:4;">어깨 너비</div>
-          <div class="pin-bubble pin-waist" style="z-index:4;">허리 길이</div>
-          <div class="pin-bubble pin-arm" style="z-index:4;">팔 길이</div>
+            <!-- 2. 좌측면 가이드 SVG (숨김 기본) -->
+            <svg class="body-guide-svg" id="guideSvgLeft" viewBox="0 0 100 220" fill="none" style="display:none;">
+              <!-- 머리 & 턱선 (왼쪽 응시) -->
+              <path d="M48 10 C38 10 32 18 34 26 C35 30 38 34 44 36 L44 45 L54 45 L54 36 C60 34 64 26 62 18 C60 12 55 10 48 10 Z" stroke="#38c9b2" stroke-width="1.8" fill="rgba(56,201,178,0.08)" stroke-dasharray="3 2"/>
+              <!-- 측면 척추 정렬 S커브선 (경추-흉추-요추-천골) -->
+              <path d="M50 36 Q44 48 48 64 Q54 82 46 98 Q42 110 48 116" stroke="#38c9b2" stroke-width="2" fill="none" opacity="0.95"/>
+              <!-- 가슴 & 복부 측면 윤곽선 -->
+              <path d="M38 46 C34 56 32 68 36 78 C38 84 37 92 35 106 C40 114 55 116 62 106 C64 94 62 76 56 60 C53 50 46 44 38 46 Z" stroke="#38c9b2" stroke-width="1.8" fill="rgba(56,201,178,0.08)" stroke-dasharray="3 2"/>
+              <!-- 측면 팔 라인 -->
+              <path d="M44 48 C42 68 41 90 42 112 C45 112 47 111 48 108 C47 90 48 70 50 50 Z" stroke="#38c9b2" stroke-width="1.6" fill="rgba(56,201,178,0.06)" stroke-dasharray="3 2"/>
+              <!-- 측면 다리 라인 -->
+              <path d="M36 106 C38 135 40 165 42 205 L56 205 C54 165 58 135 60 106 Z" stroke="#38c9b2" stroke-width="1.8" fill="rgba(56,201,178,0.06)"/>
+              <!-- 수직 바른자세 기준선 (귀-어깨-골반-복사뼈) -->
+              <line x1="48" y1="8" x2="48" y2="210" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.75"/>
+              <circle cx="48" cy="26" r="3" fill="#ffffff"/>
+              <circle cx="48" cy="48" r="3" fill="#ffffff"/>
+              <circle cx="48" cy="106" r="3" fill="#ffffff"/>
+              <circle cx="48" cy="160" r="3" fill="#ffffff"/>
+              <circle cx="48" cy="202" r="3" fill="#ffffff"/>
+            </svg>
+
+            <!-- 3. 우측면 가이드 SVG (숨김 기본) -->
+            <svg class="body-guide-svg" id="guideSvgRight" viewBox="0 0 100 220" fill="none" style="display:none;">
+              <!-- 머리 & 턱선 (오른쪽 응시) -->
+              <path d="M52 10 C62 10 68 18 66 26 C65 30 62 34 56 36 L56 45 L46 45 L46 36 C40 34 36 26 38 18 C40 12 45 10 52 10 Z" stroke="#38c9b2" stroke-width="1.8" fill="rgba(56,201,178,0.08)" stroke-dasharray="3 2"/>
+              <!-- 측면 척추 정렬 S커브선 (대칭) -->
+              <path d="M50 36 Q56 48 52 64 Q46 82 54 98 Q58 110 52 116" stroke="#38c9b2" stroke-width="2" fill="none" opacity="0.95"/>
+              <!-- 가슴 & 복부 측면 윤곽선 -->
+              <path d="M62 46 C66 56 68 68 64 78 C62 84 63 92 65 106 C60 114 45 116 38 106 C36 94 38 76 44 60 C47 50 54 44 62 46 Z" stroke="#38c9b2" stroke-width="1.8" fill="rgba(56,201,178,0.08)" stroke-dasharray="3 2"/>
+              <!-- 측면 팔 라인 -->
+              <path d="M56 48 C58 68 59 90 58 112 C55 112 53 111 52 108 C53 90 52 70 50 50 Z" stroke="#38c9b2" stroke-width="1.6" fill="rgba(56,201,178,0.06)" stroke-dasharray="3 2"/>
+              <!-- 측면 다리 라인 -->
+              <path d="M64 106 C62 135 60 165 58 205 L44 205 C46 165 42 135 40 106 Z" stroke="#38c9b2" stroke-width="1.8" fill="rgba(56,201,178,0.06)"/>
+              <!-- 수직 바른자세 기준선 -->
+              <line x1="52" y1="8" x2="52" y2="210" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.75"/>
+              <circle cx="52" cy="26" r="3" fill="#ffffff"/>
+              <circle cx="52" cy="48" r="3" fill="#ffffff"/>
+              <circle cx="52" cy="106" r="3" fill="#ffffff"/>
+              <circle cx="52" cy="160" r="3" fill="#ffffff"/>
+              <circle cx="52" cy="202" r="3" fill="#ffffff"/>
+            </svg>
+          </div>
+
+          <!-- 유동 말풍선 핀 4종 -->
+          <div class="pin-bubble pin-neck" id="pinNeck" style="z-index:4;">목 둘레, 목 길이</div>
+          <div class="pin-bubble pin-shoulder" id="pinShoulder" style="z-index:4;">어깨 너비</div>
+          <div class="pin-bubble pin-waist" id="pinWaist" style="z-index:4;">허리 라인</div>
+          <div class="pin-bubble pin-arm" id="pinArm" style="z-index:4;">팔 길이</div>
 
           <!-- 촬영 모드 안내 뱃지 -->
-          <div id="cameraStatusBadge" style="position:absolute; top:12px; left:14px; background:rgba(0,0,0,0.68); color:#38c9b2; padding:5px 12px; border-radius:14px; font-size:11px; font-weight:700; z-index:5; display:flex; align-items:center; gap:6px; border:1px solid rgba(56,201,178,0.4);">
-            <span style="width:7px; height:7px; background:#38c9b2; border-radius:50%; display:inline-block;"></span>
-            <span id="cameraStatusText">HTML Media Capture 대기중</span>
+          <div id="cameraStatusBadge" style="position:absolute; top:12px; left:14px; background:rgba(0,0,0,0.72); color:#38c9b2; padding:6px 12px; border-radius:14px; font-size:11.5px; font-weight:700; z-index:5; display:flex; align-items:center; gap:6px; border:1px solid rgba(56,201,178,0.4); backdrop-filter:blur(6px);">
+            <span style="width:7px; height:7px; background:#38c9b2; border-radius:50%; display:inline-block; box-shadow:0 0 6px #38c9b2;"></span>
+            <span id="cameraStatusText">1단계: 전신(정면) 촬영 준비</span>
           </div>
         </div>
 
         <div class="capture-bottom-bar">
-          <p style="font-size:12px; color:#a4b6b1; text-align:center;" id="captureGuideNotice">정확한 분석을 위해 전신이 나오도록 촬영해 주세요.</p>
+          <!-- 3방향 썸네일 스트립 (촬영 완료 상태 및 탭 전환) -->
+          <div class="capture-thumb-strip">
+            <div class="thumb-slot active" id="thumbSlotFront" data-angle="front" title="전신 (정면)">
+              <div class="thumb-preview-box" id="thumbBoxFront">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6e8580" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <span class="thumb-label">1. 전신(정면)</span>
+            </div>
 
-          <!-- ⭐ HTML Media Capture API: capture="environment"로 모바일에서 앱 내 직접 카메라 구동 ⭐ -->
+            <div class="thumb-slot" id="thumbSlotLeft" data-angle="left" title="좌측면">
+              <div class="thumb-preview-box" id="thumbBoxLeft">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6e8580" stroke-width="2"><circle cx="12" cy="5" r="3"/><path d="M9 20l3-7 3 7"/><path d="M6 12h12"/></svg>
+              </div>
+              <span class="thumb-label">2. 좌측면</span>
+            </div>
+
+            <div class="thumb-slot" id="thumbSlotRight" data-angle="right" title="우측면">
+              <div class="thumb-preview-box" id="thumbBoxRight">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6e8580" stroke-width="2"><circle cx="12" cy="5" r="3"/><path d="M9 20l3-7 3 7"/><path d="M6 12h12"/></svg>
+              </div>
+              <span class="thumb-label">3. 우측면</span>
+            </div>
+          </div>
+
+          <p style="font-size:12px; color:#a4b6b1; text-align:center; margin:2px 0 4px 0;" id="captureGuideNotice">
+            정면을 응시하고 양팔을 가볍게 벌려 바른 자세로 서주세요.
+          </p>
+
+          <!-- ⭐ HTML Media Capture API ⭐ -->
           <input type="file" id="cameraCaptureInput" accept="image/*" capture="environment" style="display:none;">
           <!-- 갤러리 파일 업로드 -->
           <input type="file" id="filePhotoInput" accept="image/*" style="display:none;">
@@ -2365,7 +2750,7 @@
           <div class="capture-controls" id="captureControlsBefore">
             <!-- 갤러리 파일 업로드 -->
             <button class="btn-icon-sq" id="btnUploadGallery" title="앨범에서 사진 불러오기">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                 <circle cx="8.5" cy="8.5" r="1.5"/>
                 <polyline points="21 15 16 10 5 21"/>
@@ -2374,29 +2759,28 @@
 
             <!-- HTML Media Capture API 직접 촬영 버튼 -->
             <button class="btn-primary" id="btnTriggerCapture" style="flex:1;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                 <circle cx="12" cy="13" r="4"/>
               </svg>
-              <span>카메라로 직접 촬영</span>
+              <span id="btnTriggerCaptureText">카메라로 직접 촬영</span>
             </button>
 
             <!-- 모델 예시 사진 토글 -->
-            <button class="btn-icon-sq" id="btnToggleSamplePhoto" title="예시 모델 사진">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 16v-4M12 8h.01"/>
+            <button class="btn-icon-sq" id="btnToggleSamplePhoto" title="현재 각도 예시 모델 사진">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
               </svg>
             </button>
           </div>
 
-          <!-- 촬영 완료 후 확인 및 재촬영 컨트롤 (사진 획득 시 노출) -->
+          <!-- 촬영 완료 후 확인 및 다음 단계 이동 컨트롤 -->
           <div class="capture-controls" id="captureControlsAfter" style="display:none; width:100%; gap:8px;">
-            <button class="btn-secondary" id="btnRetakePhotoDirect" style="flex:1; height:48px; border-radius:var(--radius-full); font-size:14px; background:rgba(255,255,255,0.12); color:#ffffff; border-color:rgba(255,255,255,0.25);">
+            <button class="btn-secondary" id="btnRetakePhotoDirect" style="flex:1; height:48px; border-radius:var(--radius-full); font-size:13.5px; background:rgba(255,255,255,0.12); color:#ffffff; border-color:rgba(255,255,255,0.25);">
               다시 촬영
             </button>
-            <button class="btn-primary" id="btnProceedSurvey" style="flex:1.8; height:48px; font-size:14.5px;">
-              이 사진으로 분석하기 &gt;
+            <button class="btn-primary" id="btnNextAngleOrAnalyze" style="flex:1.8; height:48px; font-size:14px;">
+              <span id="btnNextAngleText">다음: 좌측면 촬영하기 &gt;</span>
             </button>
           </div>
         </div>
@@ -2407,7 +2791,9 @@
            ======================================================== -->
       <section class="screen" id="screen-survey">
         <header class="nav-header">
-          <button class="btn-back" id="btnBackToCapture">&lt;</button>
+          <button class="btn-back" id="btnBackToCapture" aria-label="뒤로가기">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
           <span class="header-title">사전 설문조사</span>
           <div style="width:36px;"></div>
         </header>
@@ -2428,9 +2814,12 @@
         <div class="survey-body">
           <!-- 1. 기본 정보 (키 1cm 단위, 몸무게 1kg 단위) -->
           <div class="survey-group">
-            <div class="survey-label">1. 기본 신체 스펙 <small>(1단위 세밀 선택)</small></div>
+            <div class="survey-label" style="display:flex; align-items:center; gap:6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary-mint-dark)" stroke-width="2.2" stroke-linecap="round"><line x1="2" y1="12" x2="22" y2="12"/><line x1="6" y1="8" x2="6" y2="16"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="18" y1="8" x2="18" y2="16"/></svg>
+              <span>1. 기본 신체 스펙 <small>(1단위 세밀 선택)</small></span>
+            </div>
             <div class="form-2col">
-              <div class="select-pill">
+              <div class="select-pill" style="position:relative;">
                 <select id="surveyHeight">
                   <option value="140">140 cm</option>
                   <option value="141">141 cm</option>
@@ -2576,7 +2965,10 @@
 
           <!-- 2. 성별 -->
           <div class="survey-group">
-            <div class="survey-label">2. 성별</div>
+            <div class="survey-label" style="display:flex; align-items:center; gap:6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary-mint-dark)" stroke-width="2.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              <span>2. 성별</span>
+            </div>
             <div class="chip-2col">
               <button class="chip-btn active" data-gender="female">여성</button>
               <button class="chip-btn" data-gender="male">남성</button>
@@ -2585,7 +2977,10 @@
 
           <!-- 3. 어깨 쇄골 -->
           <div class="survey-group">
-            <div class="survey-label">3. 어깨 및 쇄골 골격</div>
+            <div class="survey-label" style="display:flex; align-items:center; gap:6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary-mint-dark)" stroke-width="2.2" stroke-linecap="round"><path d="M4 10h16M7 6l5 4 5-4"/></svg>
+              <span>3. 어깨 및 쇄골 골격</span>
+            </div>
             <div class="chip-3col">
               <button class="chip-btn active" data-shoulder="straight">도톰 &amp; 탄력</button>
               <button class="chip-btn" data-shoulder="wave">가녀림 &amp; 쇄골</button>
@@ -2595,7 +2990,10 @@
 
           <!-- 4. 허리 골반 -->
           <div class="survey-group">
-            <div class="survey-label">4. 허리 둘레 및 골반 위치</div>
+            <div class="survey-label" style="display:flex; align-items:center; gap:6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary-mint-dark)" stroke-width="2.2" stroke-linecap="round"><path d="M5 8c3 2 4 6 2 10M19 8c-3 2-4 6-2 10"/></svg>
+              <span>4. 허리 둘레 및 골반 위치</span>
+            </div>
             <div class="chip-2col">
               <button class="chip-btn active" data-waist="high">골반 높고 허리 뚜렷</button>
               <button class="chip-btn" data-waist="long">허리선 길고 완만함</button>
@@ -2604,7 +3002,10 @@
 
           <!-- 5. 평소 고민 부위 (복수 선택 - 첨부 3) -->
           <div class="survey-group">
-            <div class="survey-label">5. 평소 고민 부위 <small>(복수 선택 가능)</small></div>
+            <div class="survey-label" style="display:flex; align-items:center; gap:6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary-mint-dark)" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
+              <span>5. 평소 고민 부위 <small>(복수 선택 가능)</small></span>
+            </div>
             <div class="chip-2col">
               <button class="chip-btn chip-multi" data-worry="shoulder">어깨</button>
               <button class="chip-btn chip-multi active" data-worry="waist">허리</button>
@@ -2615,7 +3016,10 @@
 
           <!-- 6. 체중 증가 패턴 -->
           <div class="survey-group">
-            <div class="survey-label">6. 체중 증가 시 살이 붙는 패턴</div>
+            <div class="survey-label" style="display:flex; align-items:center; gap:6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary-mint-dark)" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <span>6. 체중 증가 시 살이 붙는 패턴</span>
+            </div>
             <div class="chip-3col">
               <button class="chip-btn active" data-fat="upper">상체/팔뚝</button>
               <button class="chip-btn" data-fat="lower">하체/엉덩이</button>
@@ -2636,13 +3040,30 @@
           <div class="radar-circle rc-2"></div>
           <div class="radar-circle rc-3"></div>
           <div class="scan-beam"></div>
-          <svg width="58" height="85" viewBox="0 0 60 90" fill="none">
-            <circle cx="30" cy="16" r="9" fill="#38c9b2"/>
-            <!-- 양팔 (왼팔, 오른팔) -->
-            <path d="M18 30 C13 36 10 48 13 62 C15 62 17 61 17 58 C15 47 17 38 20 33 Z" fill="#38c9b2" opacity="0.85"/>
-            <path d="M42 30 C47 36 50 48 47 62 C45 62 43 61 43 58 C45 47 43 38 40 33 Z" fill="#38c9b2" opacity="0.85"/>
-            <!-- 몸통 및 다리 -->
-            <path d="M20 31 L30 27 L40 31 L38 52 L39 60 L36 86 L32 86 L31 62 L29 62 L28 86 L24 86 L21 60 L22 52 Z" fill="#38c9b2" opacity="0.75"/>
+          <svg width="70" height="96" viewBox="0 0 70 100" fill="none">
+            <defs>
+              <linearGradient id="scanGradBody" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#4ae3cc"/>
+                <stop offset="100%" stop-color="#148d79"/>
+              </linearGradient>
+            </defs>
+            <!-- 3D 스캔 인체 모형 -->
+            <ellipse cx="35" cy="11" rx="6.5" ry="8" fill="url(#scanGradBody)"/>
+            <path d="M23 24 C28 22 32 22 35 22 C38 22 42 22 47 24 C50 26 51 31 49 37 C47 43 45 49 43 54 C42 58 43 64 44 70 L26 70 C27 64 28 58 27 54 C25 49 23 43 21 37 C19 31 20 26 23 24 Z" fill="url(#scanGradBody)" opacity="0.95"/>
+            <!-- 팔 -->
+            <path d="M19 28 C17 35 16 44 16 52 C16 57 18 63 19 66 C20 66 21 65 22 63 C21 57 21 50 22 44 C23 38 24 32 25 27 Z" fill="#24b69f"/>
+            <path d="M51 28 C53 35 54 44 54 52 C54 57 52 63 51 66 C50 66 49 65 48 63 C49 57 49 50 48 44 C47 38 46 32 45 27 Z" fill="#24b69f"/>
+            <!-- 다리 -->
+            <path d="M27 70 C28 78 29 86 29 94 C29 97 28 99 27 100 L34 100 C35 97 35 93 35 88 C35 82 34 76 35 70 Z" fill="#189380"/>
+            <path d="M43 70 C42 78 41 86 41 94 C41 97 42 99 43 100 L36 100 C35 97 35 93 35 88 C35 82 36 76 35 70 Z" fill="#189380"/>
+            <!-- 스캔 랜드마크 포인트 오버레이 -->
+            <circle cx="24" cy="25" r="1.8" fill="#ffffff"/>
+            <circle cx="46" cy="25" r="1.8" fill="#ffffff"/>
+            <circle cx="35" cy="40" r="1.5" fill="#ffffff"/>
+            <circle cx="28" cy="68" r="1.8" fill="#ffffff"/>
+            <circle cx="42" cy="68" r="1.8" fill="#ffffff"/>
+            <line x1="20" y1="25" x2="50" y2="25" stroke="#ffffff" stroke-width="0.8" stroke-dasharray="1.5 1.5" opacity="0.8"/>
+            <line x1="24" y1="68" x2="46" y2="68" stroke="#ffffff" stroke-width="0.8" stroke-dasharray="1.5 1.5" opacity="0.8"/>
           </svg>
         </div>
         <h3 style="font-size:19px; font-weight:800; margin-bottom:8px;">AI가 체형을 분석하고 있습니다</h3>
@@ -2682,16 +3103,22 @@
           </div>
 
           <div class="fit-grid">
-            <div class="fit-box fit-best">
-              <div style="font-weight:800; color:var(--primary-mint-dark); margin-bottom:6px;">✔ Best Fit 추천</div>
+            <div class="fit-box fit-best" style="border:1.5px solid rgba(56,201,178,0.3); background:rgba(56,201,178,0.06);">
+              <div style="font-weight:800; color:var(--primary-mint-dark); margin-bottom:8px; display:flex; align-items:center; gap:6px; font-size:13.5px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#179b88" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span>Best Fit 추천</span>
+              </div>
               <ul id="resultBestList">
                 <li>클래식 스탠다드 셔츠</li>
                 <li>일자 스트레이트 슬랙스</li>
                 <li>적당한 V넥 &amp; 스퀘어넥</li>
               </ul>
             </div>
-            <div class="fit-box fit-worst">
-              <div style="font-weight:800; color:#e75642; margin-bottom:6px;">✖ Worst Fit 주의</div>
+            <div class="fit-box fit-worst" style="border:1.5px solid rgba(231,86,66,0.25); background:rgba(231,86,66,0.04);">
+              <div style="font-weight:800; color:#e75642; margin-bottom:8px; display:flex; align-items:center; gap:6px; font-size:13.5px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e75642" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                <span>Worst Fit 주의</span>
+              </div>
               <ul id="resultWorstList">
                 <li>과도한 프릴 &amp; 퍼프소매</li>
                 <li>루즈핏 오버사이즈 롱니트</li>
@@ -2714,9 +3141,9 @@
             <div class="home-sub-title">2026 AI 퍼스널 핏 큐레이션</div>
             <h2 class="home-greeting"><span id="homeUserName">산혜</span> 님, 오늘 꼭 맞는 핏을 만나보세요 ✨</h2>
           </div>
-          <div class="avatar-icon-btn" id="btnHeaderProfile" title="내 프로필">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <div class="avatar-icon-btn" id="btnHeaderProfile" title="내 프로필" style="background:linear-gradient(135deg,rgba(56,201,178,0.15),rgba(40,189,166,0.25)); border:1.5px solid var(--primary-mint); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-mint-dark)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
               <circle cx="12" cy="7" r="4"/>
             </svg>
           </div>
@@ -2766,15 +3193,14 @@
         <div class="quick-menu-row">
           <!-- 1. AI 체형 진단 -->
           <div class="quick-menu-item" id="btnServiceAnalysis">
-            <div class="quick-menu-circle">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#20b59f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 7V4h3"/>
-                <path d="M20 7V4h-3"/>
-                <path d="M4 17v3h3"/>
-                <path d="M20 17v3h-3"/>
-                <circle cx="12" cy="8" r="2.5"/>
-                <path d="M8 17a4 4 0 0 1 8 0"/>
-                <line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="2 2" stroke-width="1.5"/>
+            <div class="quick-menu-circle" style="background:linear-gradient(135deg,#e6fbf7,#d1f6ee); border-color:rgba(56,201,178,0.4);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#179b88" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+                <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                <circle cx="12" cy="9" r="2.5"/>
+                <path d="M9 19c0-2 1.5-3.5 3-3.5s3 1.5 3 3.5"/>
               </svg>
             </div>
             <span class="quick-menu-label">체형 진단</span>
@@ -2782,10 +3208,12 @@
 
           <!-- 2. 맞춤 샵 -->
           <div class="quick-menu-item" id="btnServiceStyling">
-            <div class="quick-menu-circle">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2b7fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 3a2.5 2.5 0 0 0-2.5 2.5c0 .7.3 1.3.8 1.8L2 15a1.5 1.5 0 0 0 1 2h18a1.5 1.5 0 0 0 1-2L13.7 7.3c.5-.5.8-1.1.8-1.8A2.5 2.5 0 0 0 12 3z"/>
-                <line x1="12" y1="17" x2="12" y2="21"/>
+            <div class="quick-menu-circle" style="background:linear-gradient(135deg,#eef5ff,#dbe9ff); border-color:rgba(43,127,255,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#256fe6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3c0 .8.3 1.5.8 2L2 15a1.5 1.5 0 0 0 1 2h18a1.5 1.5 0 0 0 1-2L14.2 7c.5-.5.8-1.2.8-2a3 3 0 0 0-3-3z"/>
+                <path d="M12 17v4"/>
+                <path d="M19 6l1-1"/>
+                <path d="M18 3h2"/>
               </svg>
             </div>
             <span class="quick-menu-label">맞춤 샵</span>
@@ -2793,12 +3221,12 @@
 
           <!-- 3. 자세 교정 -->
           <div class="quick-menu-item" id="btnServicePosture">
-            <div class="quick-menu-circle">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1b9e59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="4" r="2.5"/>
-                <path d="M12 6.5v11"/>
-                <path d="M6 11h12"/>
-                <path d="M8 21l4-3.5 4 3.5"/>
+            <div class="quick-menu-circle" style="background:linear-gradient(135deg,#eaf9f1,#cff2df); border-color:rgba(27,158,89,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#168b4e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="4.5" r="2.5"/>
+                <path d="M12 7.5v6"/>
+                <path d="M5 11c2.5-1.5 5-1.8 7-1.8s4.5.3 7 1.8"/>
+                <path d="M8 21.5l4-8 4 8"/>
               </svg>
             </div>
             <span class="quick-menu-label">자세 교정</span>
@@ -2806,10 +3234,11 @@
 
           <!-- 4. 체형 마켓 -->
           <div class="quick-menu-item" id="btnServiceMarket">
-            <div class="quick-menu-circle">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff603d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="quick-menu-circle" style="background:linear-gradient(135deg,#fff1ed,#ffdcd4); border-color:rgba(255,96,61,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e04c2b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
                 <circle cx="7" cy="7" r="1.5" fill="currentColor"/>
+                <path d="M16 8l3 3"/>
               </svg>
             </div>
             <span class="quick-menu-label">체형 마켓</span>
@@ -3057,12 +3486,62 @@
            ======================================================== -->
       <section class="screen" id="screen-report-detail">
         <header class="nav-header">
-          <button class="btn-back" id="btnBackFromReport">&lt;</button>
+          <button class="btn-back" id="btnBackFromReport" aria-label="뒤로가기">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
           <span class="header-title">상세 체형 분석 리포트</span>
           <div style="width:36px;"></div>
         </header>
 
         <div class="sub-page-body">
+          <!-- ⭐ 3방향 AI 분석 촬영 사진 갤러리 카드 ⭐ -->
+          <div class="info-card" style="padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h4 style="font-size:15px; font-weight:800; margin:0;">3방향 체형 정밀 분석 뷰</h4>
+              <span style="font-size:11px; background:var(--primary-mint-soft); color:var(--primary-mint-dark); font-weight:800; padding:3px 8px; border-radius:10px;">AI 다각도 스캔 완료</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;" id="report3WayPhotoGrid">
+              <!-- 1. 전신 정면 -->
+              <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                <div style="width:100%; height:110px; border-radius:12px; overflow:hidden; background:#182320; border:1.5px solid var(--border-mint); position:relative;" id="reportPhotoBoxFront">
+                  <img id="reportPhotoImgFront" src="" alt="정면" style="width:100%; height:100%; object-fit:cover; display:none;">
+                  <div id="reportPhotoPlaceholderFront" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#5f7c76; font-size:11px; font-weight:700;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span style="margin-top:4px;">정면 사진</span>
+                  </div>
+                  <span style="position:absolute; bottom:4px; right:4px; background:rgba(0,0,0,0.65); color:#38c9b2; font-size:9.5px; font-weight:800; padding:2px 5px; border-radius:6px;">94점</span>
+                </div>
+                <span style="font-size:11px; font-weight:700; color:var(--text-main);">전신 (정면)</span>
+              </div>
+
+              <!-- 2. 좌측면 -->
+              <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                <div style="width:100%; height:110px; border-radius:12px; overflow:hidden; background:#182320; border:1.5px solid rgba(56,201,178,0.4); position:relative;" id="reportPhotoBoxLeft">
+                  <img id="reportPhotoImgLeft" src="" alt="좌측면" style="width:100%; height:100%; object-fit:cover; display:none;">
+                  <div id="reportPhotoPlaceholderLeft" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#5f7c76; font-size:11px; font-weight:700;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><path d="M9 20l3-7 3 7"/><path d="M6 12h12"/></svg>
+                    <span style="margin-top:4px;">좌측면</span>
+                  </div>
+                  <span style="position:absolute; bottom:4px; right:4px; background:rgba(0,0,0,0.65); color:#38c9b2; font-size:9.5px; font-weight:800; padding:2px 5px; border-radius:6px;">정상 S라인</span>
+                </div>
+                <span style="font-size:11px; font-weight:700; color:var(--text-main);">좌측면</span>
+              </div>
+
+              <!-- 3. 우측면 -->
+              <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                <div style="width:100%; height:110px; border-radius:12px; overflow:hidden; background:#182320; border:1.5px solid rgba(56,201,178,0.4); position:relative;" id="reportPhotoBoxRight">
+                  <img id="reportPhotoImgRight" src="" alt="우측면" style="width:100%; height:100%; object-fit:cover; display:none;">
+                  <div id="reportPhotoPlaceholderRight" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#5f7c76; font-size:11px; font-weight:700;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><path d="M9 20l3-7 3 7"/><path d="M6 12h12"/></svg>
+                    <span style="margin-top:4px;">우측면</span>
+                  </div>
+                  <span style="position:absolute; bottom:4px; right:4px; background:rgba(0,0,0,0.65); color:#38c9b2; font-size:9.5px; font-weight:800; padding:2px 5px; border-radius:6px;">대칭 98%</span>
+                </div>
+                <span style="font-size:11px; font-weight:700; color:var(--text-main);">우측면</span>
+              </div>
+            </div>
+          </div>
+
           <div class="info-card">
             <h4 style="font-size:15px; font-weight:800; margin-bottom:14px;">신체 부위별 황금 밸런스</h4>
             <div class="dim-row">
@@ -3101,7 +3580,9 @@
            ======================================================== -->
       <section class="screen" id="screen-posture">
         <header class="nav-header">
-          <button class="btn-back" id="btnBackFromPosture">&lt;</button>
+          <button class="btn-back" id="btnBackFromPosture" aria-label="뒤로가기">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
           <span class="header-title">맞춤 자세 &amp; 체형 교정</span>
           <div style="width:36px;"></div>
         </header>
@@ -3113,12 +3594,17 @@
           </div>
 
           <div class="routine-box">
-            <div class="routine-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="5" r="2.5" fill="currentColor"/>
-                <path d="M5 10 L8 14 L12 11 L16 14 L19 10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M12 11 V18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-                <path d="M9 22 L12 18 L15 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <div class="routine-icon" style="background:linear-gradient(135deg,#e3f8f4,#ccf5ed); border:1px solid rgba(56,201,178,0.4);">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--primary-mint-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- 머리 & 목 -->
+                <circle cx="12" cy="4" r="2.2" fill="currentColor"/>
+                <path d="M12 6.5v6.5"/>
+                <!-- W자 팔 벌리기 스트레칭 -->
+                <path d="M5 8.5l3.5 3 3.5-2.5 3.5 2.5 3.5-3"/>
+                <path d="M5 8.5V6"/>
+                <path d="M19 8.5V6"/>
+                <!-- 어깨 펴짐 화살표 점선 -->
+                <path d="M9 18l3-5 3 5" stroke-width="1.8"/>
               </svg>
             </div>
             <div style="flex:1;">
@@ -3129,11 +3615,14 @@
           </div>
 
           <div class="routine-box">
-            <div class="routine-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <circle cx="6" cy="18" r="2" fill="currentColor"/>
-                <path d="M8 18 H12 L16 11 L20 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M11 14.5 C13 13 15 13 17 14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="2 2"/>
+            <div class="routine-icon" style="background:linear-gradient(135deg,#eef7ff,#d7ecff); border:1px solid rgba(43,127,255,0.3);">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#256fe6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- 골반 브릿지 인체 실루엣 포즈 -->
+                <circle cx="4.5" cy="17.5" r="1.8" fill="currentColor"/>
+                <!-- 바닥에 닿은 등과 어깨에서 위로 솟은 골반 & 접힌 무릎 -->
+                <path d="M6 18h3l5-7 5 3.5 2 3.5"/>
+                <!-- 둔근 상승 화살표 -->
+                <path d="M14 16v-3m-2 1.5l2-1.5 2 1.5" stroke-width="1.6"/>
               </svg>
             </div>
             <div style="flex:1;">
@@ -3144,13 +3633,14 @@
           </div>
 
           <div class="routine-box">
-            <div class="routine-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="7" r="3" stroke="currentColor" stroke-width="2"/>
-                <path d="M12 10 V15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <path d="M7 16 C9 14.5 15 14.5 17 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-                <path d="M8 9 C6 11 6 13 8 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                <path d="M16 9 C18 11 18 13 16 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <div class="routine-icon" style="background:linear-gradient(135deg,#fbf2ff,#eed9ff); border:1px solid rgba(170,80,250,0.3);">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8e3bd9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- 머리를 감싸고 목 측면을 당기는 스트레칭 포즈 -->
+                <circle cx="12" cy="7" r="2.5" fill="currentColor"/>
+                <path d="M12 10v7"/>
+                <path d="M16 6c-1-2-5-2-6 0l-.5 3"/>
+                <path d="M8 18c2-2 6-2 8 0"/>
+                <path d="M7 13l2-1"/>
               </svg>
             </div>
             <div style="flex:1;">
@@ -3158,6 +3648,49 @@
               <div style="font-size:12px; color:var(--text-sub);">목 측면 부드럽게 당기기 (30초)</div>
             </div>
             <button class="btn-primary btn-timer-trigger" data-sec="30" style="width:60px; height:36px; font-size:12px;">시작</button>
+          </div>
+
+          <!-- 유튜브 쇼츠 추천 영상 카드 -->
+          <div style="margin-top:8px; border-radius:var(--radius-lg); overflow:hidden; border:1.5px solid var(--border-mint); background:var(--white); box-shadow:0 4px 16px rgba(32,181,159,0.10);">
+            <!-- 카드 헤더 -->
+            <div style="display:flex; align-items:center; gap:8px; padding:12px 14px 10px 14px; background:linear-gradient(135deg,#e3f8f4,#f0fbf8);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#ff0000">
+                <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1C4.5 20.4 12 20.4 12 20.4s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8z"/>
+                <polygon points="9.6,15.6 15.9,12 9.6,8.4" fill="white"/>
+              </svg>
+              <span style="font-size:13px; font-weight:800; color:var(--text-main);">추천 체형 교정 영상</span>
+              <span style="margin-left:auto; font-size:11px; font-weight:700; color:#ff0000; background:#fff0f0; padding:2px 8px; border-radius:10px;">YouTube Shorts</span>
+            </div>
+            <!-- 썸네일 + 정보 -->
+            <a href="https://youtube.com/shorts/ye8pe1j5OeQ?si=QA6bj5JIX7c60Mgc" target="_blank" rel="noopener noreferrer"
+               style="display:flex; gap:12px; padding:12px 14px; text-decoration:none; align-items:flex-start;">
+              <!-- 썸네일 -->
+              <div style="position:relative; flex-shrink:0; width:88px; height:88px; border-radius:12px; overflow:hidden; background:#1a1a2e;">
+                <img src="https://i.ytimg.com/vi/ye8pe1j5OeQ/hqdefault.jpg"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                     alt="유튜브 쇼츠 썸네일"
+                     style="width:100%; height:100%; object-fit:cover; display:block;">
+                <!-- 썸네일 로드 실패 시 대체 -->
+                <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; background:linear-gradient(135deg,#20b59f,#179b88); border-radius:12px;">
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
+                </div>
+                <!-- 재생 버튼 오버레이 -->
+                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.25);">
+                  <div style="width:28px; height:28px; background:rgba(255,255,255,0.92); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                    <svg width="11" height="11" viewBox="0 0 12 12" fill="#20b59f"><polygon points="2,1 11,6 2,11"/></svg>
+                  </div>
+                </div>
+              </div>
+              <!-- 텍스트 정보 -->
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:13.5px; font-weight:800; color:var(--text-main); line-height:1.4; margin-bottom:5px;">체형 교정 루틴 쇼츠</div>
+                <div style="font-size:12px; color:var(--text-sub); line-height:1.5; margin-bottom:8px;">체형별 맞춤 자세 교정 운동을 영상으로 확인해 보세요.</div>
+                <div style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; color:var(--primary-mint-dark); background:var(--primary-mint-soft); padding:4px 10px; border-radius:10px; border:1px solid var(--border-mint);">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                  영상 보러가기
+                </div>
+              </div>
+            </a>
           </div>
         </div>
       </section>
@@ -3167,7 +3700,9 @@
            ======================================================== -->
       <section class="screen" id="screen-styling">
         <header class="nav-header">
-          <button class="btn-back" id="btnBackFromStyling">&lt;</button>
+          <button class="btn-back" id="btnBackFromStyling" aria-label="뒤로가기">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
           <span class="header-title">SHOP (무신사 &amp; 에이블리)</span>
           <div style="width:36px;"></div>
         </header>
@@ -3391,7 +3926,9 @@
            ======================================================== -->
       <section class="screen" id="screen-market">
         <header class="nav-header">
-          <button class="btn-back" id="btnBackFromMarket">&lt;</button>
+          <button class="btn-back" id="btnBackFromMarket" aria-label="뒤로가기">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
           <span class="header-title">체형 연계 중고거래</span>
           <button id="btnOpenSellModal" style="background:none; border:none; color:var(--primary-mint-dark); font-weight:800; cursor:pointer;">판매등록</button>
         </header>
@@ -3464,6 +4001,75 @@
               <div style="font-size:15px; font-weight:800; color:var(--text-main); margin-top:6px;">₩68,000</div>
             </div>
           </div>
+
+          <!-- ======== 직거래 장소 지도 카드 ======== -->
+          <div style="margin-top:8px; border-radius:16px; overflow:hidden; background:#fff; box-shadow:var(--shadow-md); border:1px solid var(--border-mint);">
+            <!-- 카드 헤더 -->
+            <div style="padding:13px 16px 10px; display:flex; align-items:center; gap:8px; border-bottom:1px solid var(--border-mint);">
+              <div style="width:32px; height:32px; background:linear-gradient(135deg,#4de0c8,#30c0ab); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                  <circle cx="12" cy="9" r="2.5"/>
+                </svg>
+              </div>
+              <div>
+                <div style="font-size:13.5px; font-weight:800; color:var(--text-main);">📍 직거래 추천 장소</div>
+                <div style="font-size:11px; color:var(--text-muted); margin-top:1px;">안산대학교 · 경기도 안산시 상록구</div>
+              </div>
+              <a href="https://map.naver.com/p/search/%EC%95%88%EC%82%B0%EB%8C%80%ED%95%99%EA%B5%90/place/31599329" target="_blank" rel="noopener noreferrer"
+                style="margin-left:auto; font-size:11px; font-weight:700; color:var(--primary-mint-dark); background:var(--primary-mint-light); padding:4px 10px; border-radius:20px; text-decoration:none; white-space:nowrap;">
+                지도 열기 ↗
+              </a>
+            </div>
+
+            <!-- 지도 영역 (클릭 시 네이버 지도 이동) -->
+            <a href="https://map.naver.com/p/search/%EC%95%88%EC%82%B0%EB%8C%80%ED%95%99%EA%B5%90/place/31599329"
+               target="_blank" rel="noopener noreferrer"
+               id="naverMapLink"
+               style="display:block; position:relative; width:100%; height:200px; overflow:hidden; cursor:pointer; text-decoration:none;">
+              <!-- 안산대학교 지도 이미지 -->
+              <img
+                src="ansan-map.jpg"
+                alt="안산대학교 위치 지도"
+                style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;"
+                loading="lazy"
+              />
+              <!-- 클릭 오버레이 (iframe 클릭 차단 방지용) -->
+              <div style="position:absolute; inset:0; z-index:10; background:transparent;"></div>
+              <!-- 네이버 지도 배지 -->
+              <div style="position:absolute; bottom:10px; right:10px; z-index:11; background:rgba(255,255,255,0.95); border-radius:8px; padding:5px 10px; display:flex; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#03c75a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                  <circle cx="12" cy="9" r="2.5"/>
+                </svg>
+                <span style="font-size:11px; font-weight:800; color:#03c75a;">NAVER 지도로 보기</span>
+              </div>
+            </a>
+
+            <!-- 장소 정보 푸터 -->
+            <div style="padding:11px 16px; display:flex; flex-direction:column; gap:5px;">
+              <div style="display:flex; align-items:center; gap:7px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                  <circle cx="12" cy="9" r="2.5"/>
+                </svg>
+                <span style="font-size:12px; color:var(--text-sub);">경기도 안산시 상록구 안산대학로 155</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:7px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span style="font-size:12px; color:var(--text-sub);">직거래 가능 시간: 평일 09:00 – 18:00</span>
+              </div>
+              <div style="margin-top:4px; display:flex; gap:6px;">
+                <span style="font-size:10.5px; font-weight:700; background:#e8f9f5; color:var(--primary-mint-dark); padding:3px 8px; border-radius:20px;">🏫 대학교</span>
+                <span style="font-size:10.5px; font-weight:700; background:#f0f7ff; color:#2b7fff; padding:3px 8px; border-radius:20px;">🤝 직거래 안전지대</span>
+                <span style="font-size:10.5px; font-weight:700; background:#fff4e8; color:#f07d00; padding:3px 8px; border-radius:20px;">🚌 대중교통 편리</span>
+              </div>
+            </div>
+          </div>
+          <!-- ======== /직거래 장소 지도 카드 ======== -->
+
         </div>
       </section>
 
@@ -3474,22 +4080,25 @@
          ======================================================== -->
     <nav class="nav-tab-bar" id="bottomNavBar" style="display:none;">
       <button class="tab-item active" data-nav="screen-home">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9.5L12 3l9 6.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9.5z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
         </svg>
         <span>Home</span>
       </button>
 
       <button class="tab-item" data-nav="screen-report-detail">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="3"/>
-          <path d="M8 8h8M8 12h8M8 16h5"/>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+          <rect x="8" y="2" width="8" height="4" rx="1.5" ry="1.5"/>
+          <path d="M9 14l2 2 4-4"/>
+          <line x1="8" y1="10" x2="16" y2="10"/>
         </svg>
         <span>Report</span>
       </button>
 
       <button class="tab-item" data-nav="screen-styling">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
           <line x1="3" y1="6" x2="21" y2="6"/>
           <path d="M16 10a4 4 0 0 1-8 0"/>
@@ -3498,21 +4107,20 @@
       </button>
 
       <button class="tab-item" data-nav="screen-market">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+          <circle cx="7" cy="7" r="1.5" fill="currentColor"/>
+          <path d="M16 7l2 2-2 2"/>
         </svg>
         <span>Market</span>
       </button>
 
       <button class="tab-item" data-nav="screen-posture">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="4" r="2.2"/>
-          <path d="M12 7v10"/>
-          <path d="M8 11.5c2.5-1.5 5.5-1.5 8 0"/>
-          <path d="M9 21l3-4 3 4"/>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="4.5" r="2.5"/>
+          <path d="M12 7.5v6"/>
+          <path d="M5 11c2.5-1.5 5-1.8 7-1.8s4.5.3 7 1.8"/>
+          <path d="M8 21.5l4-8 4 8"/>
         </svg>
         <span>Posture</span>
       </button>
@@ -3568,6 +4176,12 @@
         bodyType: '스트레이트',
         height: 165,
         weight: 55,
+        currentAngle: 'front', // 'front' | 'left' | 'right'
+        capturedPhotos: {
+          front: null,
+          left: null,
+          right: null
+        },
         capturedPhoto: null,
         cameraStream: null,
         history: []
@@ -3616,9 +4230,11 @@
           target.scrollTop = 0;
         }
 
-        // 카메라 화면 진입 시 카메라 스트림 시도
+        // 카메라 화면 진입 시 현재 각도에 맞춰 3방향 UI 및 카메라 동기화
         if (id === 'screen-capture') {
-          if (!state.capturedPhoto) {
+          if (typeof switchCaptureAngle === 'function') {
+            switchCaptureAngle(state.currentAngle || 'front');
+          } else {
             startCameraStream();
           }
         }
@@ -3689,7 +4305,7 @@
       });
 
       // ========================================================
-      // [Step 3] HTML Media Capture API 및 실시간 카메라 로직
+      // [Step 3] AI 3방향 사진 촬영 (전신 정면, 좌측면, 우측면) 로직
       // ========================================================
       document.getElementById('btnBackToGuide').addEventListener('click', function() {
         showScreen('screen-guide', false);
@@ -3701,12 +4317,106 @@
       const cameraCanvas = document.getElementById('cameraCanvas');
       const cameraPreviewImg = document.getElementById('cameraPreviewImg');
       const cameraStatusText = document.getElementById('cameraStatusText');
+      const captureGuideNotice = document.getElementById('captureGuideNotice');
       const btnUploadGallery = document.getElementById('btnUploadGallery');
       const btnTriggerCapture = document.getElementById('btnTriggerCapture');
       const btnRetakePhotoDirect = document.getElementById('btnRetakePhotoDirect');
-      const btnProceedSurvey = document.getElementById('btnProceedSurvey');
+      const btnNextAngleOrAnalyze = document.getElementById('btnNextAngleOrAnalyze');
+      const btnNextAngleText = document.getElementById('btnNextAngleText');
       const captureControlsBefore = document.getElementById('captureControlsBefore');
       const captureControlsAfter = document.getElementById('captureControlsAfter');
+
+      // 3방향 탭 & 가이드 엘리먼트
+      const tabAngleFront = document.getElementById('tabAngleFront');
+      const tabAngleLeft = document.getElementById('tabAngleLeft');
+      const tabAngleRight = document.getElementById('tabAngleRight');
+      const thumbSlotFront = document.getElementById('thumbSlotFront');
+      const thumbSlotLeft = document.getElementById('thumbSlotLeft');
+      const thumbSlotRight = document.getElementById('thumbSlotRight');
+      const thumbBoxFront = document.getElementById('thumbBoxFront');
+      const thumbBoxLeft = document.getElementById('thumbBoxLeft');
+      const thumbBoxRight = document.getElementById('thumbBoxRight');
+      const guideSvgFront = document.getElementById('guideSvgFront');
+      const guideSvgLeft = document.getElementById('guideSvgLeft');
+      const guideSvgRight = document.getElementById('guideSvgRight');
+      const pinNeck = document.getElementById('pinNeck');
+      const pinShoulder = document.getElementById('pinShoulder');
+      const pinWaist = document.getElementById('pinWaist');
+      const pinArm = document.getElementById('pinArm');
+
+      function getAngleLabel(angle) {
+        if (angle === 'front') return '전신(정면)';
+        if (angle === 'left') return '좌측면';
+        return '우측면';
+      }
+
+      // 각도 전환 함수
+      function switchCaptureAngle(angle) {
+        state.currentAngle = angle;
+
+        // 탭 상태 업데이트
+        [tabAngleFront, tabAngleLeft, tabAngleRight].forEach(tab => {
+          if (tab) tab.classList.toggle('active', tab.dataset.angle === angle);
+        });
+
+        // 썸네일 슬롯 활성화 업데이트
+        [thumbSlotFront, thumbSlotLeft, thumbSlotRight].forEach(slot => {
+          if (slot) slot.classList.toggle('active', slot.dataset.angle === angle);
+        });
+
+        // 가이드 실루엣 표시 전환
+        if (guideSvgFront) guideSvgFront.style.display = angle === 'front' ? 'block' : 'none';
+        if (guideSvgLeft) guideSvgLeft.style.display = angle === 'left' ? 'block' : 'none';
+        if (guideSvgRight) guideSvgRight.style.display = angle === 'right' ? 'block' : 'none';
+
+        // 각도별 안내 문구 & 핀 버블
+        if (angle === 'front') {
+          if (captureGuideNotice) captureGuideNotice.textContent = '정면을 응시하고 양팔을 가볍게 벌려 바른 자세로 서주세요.';
+          if (pinNeck) pinNeck.textContent = '목 둘레, 목 길이';
+          if (pinShoulder) pinShoulder.textContent = '어깨 너비';
+          if (pinWaist) pinWaist.textContent = '허리 라인';
+          if (pinArm) pinArm.textContent = '골격 중심선';
+        } else if (angle === 'left') {
+          if (captureGuideNotice) captureGuideNotice.textContent = '왼쪽으로 90° 회전하여 측면 실루엣이 보이도록 서주세요.';
+          if (pinNeck) pinNeck.textContent = '거북목 각도';
+          if (pinShoulder) pinShoulder.textContent = '라운드숄더';
+          if (pinWaist) pinWaist.textContent = '척추 S라인 곡선';
+          if (pinArm) pinArm.textContent = '골반 전방경사';
+        } else {
+          if (captureGuideNotice) captureGuideNotice.textContent = '오른쪽으로 90° 회전하여 반대편 측면 실루엣을 맞춰주세요.';
+          if (pinNeck) pinNeck.textContent = '경추 정렬 상태';
+          if (pinShoulder) pinShoulder.textContent = '등 굽음도 (흉추)';
+          if (pinWaist) pinWaist.textContent = '흉곽 & 허리 각도';
+          if (pinArm) pinArm.textContent = '골반 수평축 & 무릎';
+        }
+
+        // 해당 각도에 사진이 이미 있는 경우 프리뷰 및 확인 모드
+        const currentData = state.capturedPhotos[angle];
+        if (currentData) {
+          cameraPreviewImg.src = currentData;
+          cameraPreviewImg.style.display = 'block';
+          stopCameraStream();
+          captureControlsBefore.style.display = 'none';
+          captureControlsAfter.style.display = 'flex';
+          cameraStatusText.textContent = `${getAngleLabel(angle)} 촬영 완료 (확인)`;
+          updateNextButtonUI();
+        } else {
+          cameraPreviewImg.style.display = 'none';
+          captureControlsBefore.style.display = 'flex';
+          captureControlsAfter.style.display = 'none';
+          cameraStatusText.textContent = `${getAngleLabel(angle)} 촬영 준비`;
+          startCameraStream();
+        }
+      }
+
+      // 탭 & 슬롯 클릭 이벤트 연결
+      if (tabAngleFront) tabAngleFront.addEventListener('click', () => switchCaptureAngle('front'));
+      if (tabAngleLeft) tabAngleLeft.addEventListener('click', () => switchCaptureAngle('left'));
+      if (tabAngleRight) tabAngleRight.addEventListener('click', () => switchCaptureAngle('right'));
+
+      if (thumbSlotFront) thumbSlotFront.addEventListener('click', () => switchCaptureAngle('front'));
+      if (thumbSlotLeft) thumbSlotLeft.addEventListener('click', () => switchCaptureAngle('left'));
+      if (thumbSlotRight) thumbSlotRight.addEventListener('click', () => switchCaptureAngle('right'));
 
       // 웹캠 / 디바이스 라이브 비디오 스트림 시도
       function startCameraStream() {
@@ -3718,13 +4428,13 @@
             cameraLiveVideo.srcObject = stream;
             cameraLiveVideo.style.display = 'block';
             cameraPreviewImg.style.display = 'none';
-            cameraStatusText.textContent = 'LIVE 카메라 활성화';
+            cameraStatusText.textContent = `LIVE: ${getAngleLabel(state.currentAngle)} 카메라 작동중`;
           }).catch(function(err) {
             console.log('Camera stream not active, using HTML Media Capture API fallback:', err);
-            cameraStatusText.textContent = 'HTML Media Capture 대기중';
+            cameraStatusText.textContent = `${getAngleLabel(state.currentAngle)} 촬영 준비`;
           });
         } else {
-          cameraStatusText.textContent = 'HTML Media Capture 대기중';
+          cameraStatusText.textContent = `${getAngleLabel(state.currentAngle)} 촬영 준비`;
         }
       }
 
@@ -3739,16 +4449,102 @@
         }
       }
 
+      // 다음 액션 버튼 UI 업데이트
+      function updateNextButtonUI() {
+        const hasFront = !!state.capturedPhotos.front;
+        const hasLeft = !!state.capturedPhotos.left;
+        const hasRight = !!state.capturedPhotos.right;
+
+        // 다음 미완료 각도 찾기
+        let nextTarget = null;
+        if (state.currentAngle === 'front') {
+          if (!hasLeft) nextTarget = 'left';
+          else if (!hasRight) nextTarget = 'right';
+        } else if (state.currentAngle === 'left') {
+          if (!hasRight) nextTarget = 'right';
+          else if (!hasFront) nextTarget = 'front';
+        } else if (state.currentAngle === 'right') {
+          if (!hasFront) nextTarget = 'front';
+          else if (!hasLeft) nextTarget = 'left';
+        }
+
+        if (nextTarget) {
+          btnNextAngleText.textContent = `다음: ${getAngleLabel(nextTarget)} 촬영하기 >`;
+          btnNextAngleOrAnalyze.dataset.next = nextTarget;
+        } else {
+          // 3방향 모두 완료됨
+          btnNextAngleText.textContent = '3방향 체형 분석 시작하기 ✨';
+          btnNextAngleOrAnalyze.dataset.next = 'analyze';
+        }
+      }
+
       // 촬영된 이미지 적용 함수
       function applyCapturedPhoto(dataUrl) {
-        state.capturedPhoto = dataUrl;
+        const curAngle = state.currentAngle;
+        state.capturedPhotos[curAngle] = dataUrl;
+        state.capturedPhoto = state.capturedPhotos.front || dataUrl;
+
         cameraPreviewImg.src = dataUrl;
         cameraPreviewImg.style.display = 'block';
         stopCameraStream();
 
         captureControlsBefore.style.display = 'none';
         captureControlsAfter.style.display = 'flex';
-        cameraStatusText.textContent = '촬영 완료 (확인)';
+        cameraStatusText.textContent = `${getAngleLabel(curAngle)} 촬영 완료 (확인)`;
+
+        // 썸네일 슬롯 업데이트
+        updateThumbSlotUI(curAngle, dataUrl);
+
+        // 탭 뱃지 완료 표시
+        updateTabBadgeUI(curAngle);
+
+        updateNextButtonUI();
+      }
+
+      // 썸네일 슬롯 UI 업데이트
+      function updateThumbSlotUI(angle, dataUrl) {
+        let box = null;
+        let slot = null;
+        if (angle === 'front') { box = thumbBoxFront; slot = thumbSlotFront; }
+        else if (angle === 'left') { box = thumbBoxLeft; slot = thumbSlotLeft; }
+        else { box = thumbBoxRight; slot = thumbSlotRight; }
+
+        if (box && slot) {
+          if (dataUrl) {
+            box.innerHTML = `<img src="${dataUrl}" alt="${angle}" style="width:100%; height:100%; object-fit:cover;">`;
+            slot.classList.add('completed');
+            if (!slot.querySelector('.thumb-check-icon')) {
+              const check = document.createElement('div');
+              check.className = 'thumb-check-icon';
+              check.textContent = '✓';
+              slot.appendChild(check);
+            }
+          } else {
+            box.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6e8580" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/></svg>`;
+            slot.classList.remove('completed');
+            const check = slot.querySelector('.thumb-check-icon');
+            if (check) check.remove();
+          }
+        }
+      }
+
+      // 탭 뱃지 UI 업데이트
+      function updateTabBadgeUI(angle) {
+        let tab = null;
+        let badge = null;
+        if (angle === 'front') { tab = tabAngleFront; badge = document.getElementById('badgeStepFront'); }
+        else if (angle === 'left') { tab = tabAngleLeft; badge = document.getElementById('badgeStepLeft'); }
+        else { tab = tabAngleRight; badge = document.getElementById('badgeStepRight'); }
+
+        if (tab && badge) {
+          if (state.capturedPhotos[angle]) {
+            tab.classList.add('completed');
+            badge.textContent = '✓';
+          } else {
+            tab.classList.remove('completed');
+            badge.textContent = angle === 'front' ? '1' : (angle === 'left' ? '2' : '3');
+          }
+        }
       }
 
       // 1) 갤러리 업로드 버튼
@@ -3769,7 +4565,7 @@
           const dataUrl = cameraCanvas.toDataURL('image/jpeg', 0.92);
           applyCapturedPhoto(dataUrl);
         } else {
-          // HTML Media Capture API (<input type="file" accept="image/*" capture="environment">) 실행
+          // HTML Media Capture API 실행
           cameraCaptureInput.click();
         }
       });
@@ -3798,25 +4594,42 @@
         }
       });
 
-      // 예시 사진 토글
-      const sampleSvg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="700" viewBox="0 0 400 700"><rect width="400" height="700" fill="%232b3834"/><circle cx="200" cy="150" r="45" fill="%2338c9b2" opacity="0.6"/><path d="M140 240 L260 240 L280 430 L230 450 L240 650 L210 650 L200 480 L190 650 L160 650 L170 450 L120 430 Z" fill="%2338c9b2" opacity="0.45"/></svg>';
+      // 3방향 고화질 예시 모델 사진 SVG
+      const sampleModelSvgs = {
+        front: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="700" viewBox="0 0 400 700"><rect width="400" height="700" fill="%231a2623"/><circle cx="200" cy="120" r="45" fill="%2338c9b2" opacity="0.85"/><path d="M130 190 L270 190 L285 360 L235 380 L245 620 L215 620 L200 420 L185 620 L155 620 L165 380 L115 360 Z" fill="%2338c9b2" opacity="0.65"/><line x1="120" y1="190" x2="280" y2="190" stroke="%23ffffff" stroke-width="3" stroke-dasharray="6 4"/><line x1="200" y1="60" x2="200" y2="650" stroke="%23ffffff" stroke-width="2" stroke-dasharray="8 6" opacity="0.6"/><circle cx="140" cy="190" r="7" fill="%23ffffff"/><circle cx="260" cy="190" r="7" fill="%23ffffff"/><text x="200" y="670" font-family="sans-serif" font-size="18" fill="%2338c9b2" font-weight="bold" text-anchor="middle">FRONT (전신 정면 모델)</text></svg>',
+        left: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="700" viewBox="0 0 400 700"><rect width="400" height="700" fill="%23162421"/><circle cx="180" cy="120" r="42" fill="%2338c9b2" opacity="0.85"/><path d="M150 190 Q220 220 200 320 Q160 380 230 450 L210 630 L170 630 L165 460 Q140 370 145 280 Z" fill="%2338c9b2" opacity="0.65"/><path d="M180 120 L180 640" stroke="%23ffffff" stroke-width="3" stroke-dasharray="6 4" opacity="0.75"/><circle cx="180" cy="120" r="6" fill="%23ffffff"/><circle cx="180" cy="210" r="6" fill="%23ffffff"/><circle cx="180" cy="420" r="6" fill="%23ffffff"/><circle cx="180" cy="630" r="6" fill="%23ffffff"/><text x="200" y="670" font-family="sans-serif" font-size="18" fill="%2338c9b2" font-weight="bold" text-anchor="middle">LEFT (좌측면 정렬 모델)</text></svg>',
+        right: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="700" viewBox="0 0 400 700"><rect width="400" height="700" fill="%23162421"/><circle cx="220" cy="120" r="42" fill="%2338c9b2" opacity="0.85"/><path d="M250 190 Q180 220 200 320 Q240 380 170 450 L190 630 L230 630 L235 460 Q260 370 255 280 Z" fill="%2338c9b2" opacity="0.65"/><path d="M220 120 L220 640" stroke="%23ffffff" stroke-width="3" stroke-dasharray="6 4" opacity="0.75"/><circle cx="220" cy="120" r="6" fill="%23ffffff"/><circle cx="220" cy="210" r="6" fill="%23ffffff"/><circle cx="220" cy="420" r="6" fill="%23ffffff"/><circle cx="220" cy="630" r="6" fill="%23ffffff"/><text x="200" y="670" font-family="sans-serif" font-size="18" fill="%2338c9b2" font-weight="bold" text-anchor="middle">RIGHT (우측면 정렬 모델)</text></svg>'
+      };
+
       document.getElementById('btnToggleSamplePhoto').addEventListener('click', function() {
-        applyCapturedPhoto(sampleSvg);
+        const cur = state.currentAngle;
+        const svg = sampleModelSvgs[cur] || sampleModelSvgs.front;
+        applyCapturedPhoto(svg);
       });
 
-      // 다시 촬영
+      // 다시 촬영 (현재 각도 재촬영)
       btnRetakePhotoDirect.addEventListener('click', function() {
-        state.capturedPhoto = null;
+        const cur = state.currentAngle;
+        state.capturedPhotos[cur] = null;
+        updateThumbSlotUI(cur, null);
+        updateTabBadgeUI(cur);
+
         cameraPreviewImg.style.display = 'none';
         captureControlsBefore.style.display = 'flex';
         captureControlsAfter.style.display = 'none';
-        cameraStatusText.textContent = 'HTML Media Capture 준비';
+        cameraStatusText.textContent = `${getAngleLabel(cur)} 촬영 준비`;
         startCameraStream();
       });
 
-      // 이 사진으로 설문조사 진행
-      btnProceedSurvey.addEventListener('click', function() {
-        showScreen('screen-survey');
+      // 다음 각도 이동 또는 설문조사 진행
+      btnNextAngleOrAnalyze.addEventListener('click', function() {
+        const next = btnNextAngleOrAnalyze.dataset.next;
+        if (next === 'front' || next === 'left' || next === 'right') {
+          switchCaptureAngle(next);
+        } else {
+          // 분석(사전 설문조사)으로 이동
+          showScreen('screen-survey');
+        }
       });
 
       // ========================================================
@@ -3843,11 +4656,37 @@
         });
       }
 
+      function syncReportPhotos() {
+        const reportImgF = document.getElementById('reportPhotoImgFront');
+        const reportPhF = document.getElementById('reportPhotoPlaceholderFront');
+        const reportImgL = document.getElementById('reportPhotoImgLeft');
+        const reportPhL = document.getElementById('reportPhotoPlaceholderLeft');
+        const reportImgR = document.getElementById('reportPhotoImgRight');
+        const reportPhR = document.getElementById('reportPhotoPlaceholderRight');
+
+        if (state.capturedPhotos.front && reportImgF) {
+          reportImgF.src = state.capturedPhotos.front;
+          reportImgF.style.display = 'block';
+          if (reportPhF) reportPhF.style.display = 'none';
+        }
+        if (state.capturedPhotos.left && reportImgL) {
+          reportImgL.src = state.capturedPhotos.left;
+          reportImgL.style.display = 'block';
+          if (reportPhL) reportPhL.style.display = 'none';
+        }
+        if (state.capturedPhotos.right && reportImgR) {
+          reportImgR.src = state.capturedPhotos.right;
+          reportImgR.style.display = 'block';
+          if (reportPhR) reportPhR.style.display = 'none';
+        }
+      }
+
       function updateUserBodySpecUI() {
         const marketLabel = document.querySelector('#screen-market span[style*="font-weight:700"]');
         if (marketLabel) {
           marketLabel.textContent = `내 체형(${state.height}cm / ${state.weight}kg / ${state.bodyType}) 맞춤만 보기`;
         }
+        syncReportPhotos();
       }
 
       // 칩 단일 선택
@@ -3892,11 +4731,13 @@
       function runLoading() {
         const textEl = document.getElementById('loadingStatusText');
         const msgs = [
-          '신체 랜드마크 33개 포인트 측정 중...',
-          '목 길이, 어깨 너비, 골반 비율 교차 분석 중...',
-          '개인 맞춤 황금 밸런스 및 체형 산출 완료!'
+          '전신(정면) 랜드마크 33개 포인트 정렬 스캔 중...',
+          '좌측면 척추 만곡도 & 거북목 각도 측정 중...',
+          '우측면 골반 전방경사 및 대칭 밸런스 교차 검증 중...',
+          '3방향 종합 데이터 기반 3대 골격 체형 도출 완료!'
         ];
         let idx = 0;
+        textEl.textContent = msgs[0];
         const timer = setInterval(function() {
           idx++;
           if (idx < msgs.length) {
@@ -3906,7 +4747,7 @@
             renderResult();
             showScreen('screen-result');
           }
-        }, 800);
+        }, 750);
       }
 
       // ========================================================
@@ -4068,11 +4909,29 @@
           if (homeBannerSubMeta) homeBannerSubMeta.textContent = '신체 밸런스 94점 · 황금비율 지수 1:1.6 (상체 중심축 볼륨형)';
 
           const straightSvg = `
-            <svg width="85" height="130" viewBox="0 0 100 150" fill="none">
-              <circle cx="50" cy="20" r="14" fill="#38c9b2"/>
-              <path d="M30 45 L50 40 L70 45 L74 75 L64 105 L50 110 L36 105 L26 75 Z" fill="#4fe0c8" opacity="0.85"/>
-              <path d="M36 105 L32 150 L44 150 L48 110 Z" fill="#2ca894"/>
-              <path d="M64 105 L68 150 L56 150 L52 110 Z" fill="#38c9b2"/>
+            <svg width="105" height="145" viewBox="0 0 120 160" fill="none">
+              <defs>
+                <linearGradient id="resGradStr" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#4ae3cc"/>
+                  <stop offset="50%" stop-color="#28bda6"/>
+                  <stop offset="100%" stop-color="#199984"/>
+                </linearGradient>
+                <filter id="resGlowStr" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur"/>
+                  <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                </filter>
+              </defs>
+              <ellipse cx="60" cy="18" rx="10" ry="12" fill="url(#resGradStr)"/>
+              <path d="M56 29 L56 37 L64 37 L64 29 Z" fill="url(#resGradStr)"/>
+              <path d="M42 38 C47 36 53 36 60 36 C67 36 73 36 78 38 C83 40 85 45 84 52 C83 60 79 66 75 72 C73 75 71 82 72 90 C73 97 76 102 78 106 L42 106 C44 102 47 97 48 90 C49 82 47 75 45 72 C41 66 37 60 36 52 C35 45 37 40 42 38 Z" fill="url(#resGradStr)"/>
+              <path d="M35 44 C33 52 30 65 30 78 C30 88 32 98 33 105 C35 105 37 104 38 101 C36 94 35 84 36 76 C37 68 39 56 41 46 Z" fill="#22aa94"/>
+              <path d="M85 44 C87 52 90 65 90 78 C90 88 88 98 87 105 C85 105 83 104 82 101 C84 94 85 84 84 76 C83 68 81 56 79 46 Z" fill="#22aa94"/>
+              <path d="M44 106 C45 116 47 128 47 138 C47 146 45 152 44 156 L55 156 C57 151 57 144 57 136 C57 126 56 116 57 106 Z" fill="#1b8e7c"/>
+              <path d="M76 106 C75 116 73 128 73 138 C73 146 75 152 76 156 L65 156 C63 151 63 144 63 136 C63 126 64 116 63 106 Z" fill="#1b8e7c"/>
+              <line x1="36" y1="41" x2="84" y2="41" stroke="#ffffff" stroke-width="1.3" stroke-dasharray="2 2" opacity="0.9"/>
+              <circle cx="51" cy="54" r="2.5" fill="#ffffff" filter="url(#resGlowStr)"/>
+              <circle cx="69" cy="54" r="2.5" fill="#ffffff" filter="url(#resGlowStr)"/>
+              <line x1="40" y1="104" x2="80" y2="104" stroke="#ffffff" stroke-width="1.3" stroke-dasharray="2 2" opacity="0.9"/>
             </svg>
           `;
           if (svgBox) svgBox.innerHTML = straightSvg;
@@ -4093,11 +4952,30 @@
           if (homeBannerSubMeta) homeBannerSubMeta.textContent = '신체 밸런스 92점 · 황금비율 지수 1:1.5 (하체 중심 라인형)';
 
           const waveSvg = `
-            <svg width="85" height="130" viewBox="0 0 100 150" fill="none">
-              <circle cx="50" cy="20" r="12" fill="#38c9b2"/>
-              <path d="M36 45 L50 40 L64 45 L62 70 L68 106 L50 112 L32 106 L38 70 Z" fill="#4fe0c8" opacity="0.85"/>
-              <path d="M32 106 L28 150 L42 150 L48 112 Z" fill="#2ca894"/>
-              <path d="M68 106 L72 150 L58 150 L52 112 Z" fill="#38c9b2"/>
+            <svg width="105" height="145" viewBox="0 0 120 160" fill="none">
+              <defs>
+                <linearGradient id="resGradWav" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#55e8d2"/>
+                  <stop offset="50%" stop-color="#22baa2"/>
+                  <stop offset="100%" stop-color="#148d79"/>
+                </linearGradient>
+                <filter id="resGlowWav" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur"/>
+                  <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                </filter>
+              </defs>
+              <ellipse cx="60" cy="16" rx="9" ry="11" fill="url(#resGradWav)"/>
+              <path d="M57 26 L57 37 L63 37 L63 26 Z" fill="url(#resGradWav)"/>
+              <path d="M46 38 C49 37 54 37 60 37 C66 37 71 37 74 38 C79 40 80 46 78 54 C76 62 72 70 68 76 C66 80 65 85 66 90 C68 96 75 102 81 108 L39 108 C45 102 52 96 54 90 C55 85 54 80 52 76 C48 70 44 62 42 54 C40 46 41 40 46 38 Z" fill="url(#resGradWav)"/>
+              <path d="M39 44 C37 52 35 65 35 78 C35 88 36 98 37 105 C38 105 40 104 41 101 C40 94 39 84 40 76 C41 68 43 56 44 46 Z" fill="#22aa94"/>
+              <path d="M81 44 C83 52 85 65 85 78 C85 88 84 98 83 105 C82 105 80 104 79 101 C80 94 81 84 80 76 C79 68 77 56 76 46 Z" fill="#22aa94"/>
+              <path d="M41 108 C43 118 45 130 45 140 C45 147 44 153 43 156 L54 156 C55 151 55 144 55 137 C55 127 54 117 55 108 Z" fill="#1b8e7c"/>
+              <path d="M79 108 C77 118 75 130 75 140 C75 147 76 153 77 156 L66 156 C65 151 65 144 65 137 C65 127 66 117 65 108 Z" fill="#1b8e7c"/>
+              <path d="M49 41 Q60 44 71 41" stroke="#ffffff" stroke-width="1.3" fill="none" opacity="0.9"/>
+              <line x1="51" y1="78" x2="69" y2="78" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.8"/>
+              <line x1="36" y1="102" x2="84" y2="102" stroke="#ffffff" stroke-width="1.4" stroke-dasharray="2 2" opacity="0.9"/>
+              <circle cx="39" cy="102" r="2.5" fill="#ffffff" filter="url(#resGlowWav)"/>
+              <circle cx="81" cy="102" r="2.5" fill="#ffffff" filter="url(#resGlowWav)"/>
             </svg>
           `;
           if (svgBox) svgBox.innerHTML = waveSvg;
@@ -4118,11 +4996,29 @@
           if (homeBannerSubMeta) homeBannerSubMeta.textContent = '신체 밸런스 96점 · 황금비율 지수 1:1.7 (내추럴 프레임 균형형)';
 
           const naturalSvg = `
-            <svg width="85" height="130" viewBox="0 0 100 150" fill="none">
-              <circle cx="50" cy="20" r="13" fill="#38c9b2"/>
-              <path d="M26 44 L50 40 L74 44 L72 78 L64 105 L50 112 L36 105 L28 78 Z" fill="#4fe0c8" opacity="0.85"/>
-              <path d="M36 105 L32 150 L46 150 L48 112 Z" fill="#2ca894"/>
-              <path d="M64 105 L68 150 L54 150 L52 112 Z" fill="#38c9b2"/>
+            <svg width="105" height="145" viewBox="0 0 120 160" fill="none">
+              <defs>
+                <linearGradient id="resGradNat" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#5ff0d8"/>
+                  <stop offset="50%" stop-color="#2fc9b2"/>
+                  <stop offset="100%" stop-color="#189d87"/>
+                </linearGradient>
+                <filter id="resGlowNat" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur"/>
+                  <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                </filter>
+              </defs>
+              <ellipse cx="60" cy="17" rx="10" ry="12" fill="url(#resGradNat)"/>
+              <path d="M55 28 L55 36 L65 36 L65 28 Z" fill="url(#resGradNat)"/>
+              <path d="M37 38 C44 36 52 36 60 36 C68 36 76 36 83 38 C89 40 90 46 88 54 C86 63 82 72 79 80 C77 86 76 94 77 106 L43 106 C44 94 43 86 41 80 C38 72 34 63 32 54 C30 46 31 40 37 38 Z" fill="url(#resGradNat)"/>
+              <path d="M30 42 C27 52 26 66 26 80 C26 90 28 100 29 108 C31 108 33 107 34 104 C32 96 31 85 32 76 C33 67 36 54 38 45 Z" fill="#22aa94"/>
+              <path d="M90 42 C93 52 94 66 94 80 C94 90 92 100 91 108 C89 108 87 107 86 104 C88 96 89 85 88 76 C87 67 84 54 82 45 Z" fill="#22aa94"/>
+              <path d="M43 106 C44 117 45 129 45 139 C45 147 43 153 42 156 L54 156 C56 151 57 144 57 136 C57 126 56 116 57 106 Z" fill="#1b8e7c"/>
+              <path d="M77 106 C76 117 75 129 75 139 C75 147 77 153 78 156 L66 156 C64 151 63 144 63 136 C63 126 64 116 63 106 Z" fill="#1b8e7c"/>
+              <line x1="30" y1="39" x2="90" y2="39" stroke="#ffffff" stroke-width="1.6" stroke-dasharray="2 2" opacity="0.95"/>
+              <circle cx="33" cy="39" r="3" fill="#ffffff" filter="url(#resGlowNat)"/>
+              <circle cx="87" cy="39" r="3" fill="#ffffff" filter="url(#resGlowNat)"/>
+              <line x1="42" y1="42" x2="78" y2="42" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
             </svg>
           `;
           if (svgBox) svgBox.innerHTML = naturalSvg;
@@ -4140,6 +5036,30 @@
         }
 
         updateUserBodySpecUI();
+
+        // 상세 리포트 화면 3방향 사진 뷰 동기화
+        const reportImgF = document.getElementById('reportPhotoImgFront');
+        const reportPhF = document.getElementById('reportPhotoPlaceholderFront');
+        const reportImgL = document.getElementById('reportPhotoImgLeft');
+        const reportPhL = document.getElementById('reportPhotoPlaceholderLeft');
+        const reportImgR = document.getElementById('reportPhotoImgRight');
+        const reportPhR = document.getElementById('reportPhotoPlaceholderRight');
+
+        if (state.capturedPhotos.front && reportImgF) {
+          reportImgF.src = state.capturedPhotos.front;
+          reportImgF.style.display = 'block';
+          if (reportPhF) reportPhF.style.display = 'none';
+        }
+        if (state.capturedPhotos.left && reportImgL) {
+          reportImgL.src = state.capturedPhotos.left;
+          reportImgL.style.display = 'block';
+          if (reportPhL) reportPhL.style.display = 'none';
+        }
+        if (state.capturedPhotos.right && reportImgR) {
+          reportImgR.src = state.capturedPhotos.right;
+          reportImgR.style.display = 'block';
+          if (reportPhR) reportPhR.style.display = 'none';
+        }
       }
 
       document.getElementById('btnGoToHome').addEventListener('click', function() {
@@ -4366,6 +5286,19 @@
           }
         }
       });
+
+      // [Step 7-4] 네이버 지도 클릭 이벤트 (안산대학교)
+      const naverMapLink = document.getElementById('naverMapLink');
+      if (naverMapLink) {
+        naverMapLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.open(
+            'https://map.naver.com/p/search/%EC%95%88%EC%82%B0%EB%8C%80%ED%95%99%EA%B5%90/place/31599329',
+            '_blank',
+            'noopener,noreferrer'
+          );
+        });
+      }
 
     })();
   </script>
